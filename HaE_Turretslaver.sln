@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27703.2047
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HaE_Turretslaver", "HaE_Turretslaver\HaE_Turretslaver.csproj", "{93BC67CD-BEE9-4422-B847-BA2A04661C7C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{93BC67CD-BEE9-4422-B847-BA2A04661C7C}.Debug|x64.ActiveCfg = Debug|x64
+		{93BC67CD-BEE9-4422-B847-BA2A04661C7C}.Debug|x64.Build.0 = Debug|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9A37E4CF-B01D-4D01-BAA2-73DEF6ABFAFD}
+	EndGlobalSection
+EndGlobal
