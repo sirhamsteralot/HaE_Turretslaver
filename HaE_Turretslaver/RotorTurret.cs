@@ -17,19 +17,9 @@ using VRageMath;
 
 namespace IngameScript
 {
-    partial class Program : MyGridProgram
-    { 
-
-        public Program() {
-
-        }
-
-        public void Save()
-        {
-
-        }
-
-        public void Main(string argument, UpdateType updateSource)
+    partial class Program
+    {
+        public class RotorTurret
         {
 
         }
