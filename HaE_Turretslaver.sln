@@ -21,6 +21,7 @@ Global
 		..\..\..\MDK_Projects\Shared Projects\HaE WeaponUtils\HaE WeaponUtils.projitems*{57c7e733-954e-4755-8b80-e73b91fb4a6f}*SharedItemsImports = 13
 		..\..\..\MDK_Projects\Shared Projects\EntityTrackingModule\EntityTrackingModule.projitems*{93bc67cd-bee9-4422-b847-ba2a04661c7c}*SharedItemsImports = 4
 		..\..\..\MDK_Projects\Shared Projects\HaE GridTerminalSystemUtils\HaE GridTerminalSystemUtils.projitems*{93bc67cd-bee9-4422-b847-ba2a04661c7c}*SharedItemsImports = 4
+		..\..\..\MDK_Projects\Shared Projects\HaE RotorUtils\HaE RotorUtils.projitems*{93bc67cd-bee9-4422-b847-ba2a04661c7c}*SharedItemsImports = 4
 		..\..\..\MDK_Projects\Shared Projects\HaE Targeting\HaE Targeting.projitems*{93bc67cd-bee9-4422-b847-ba2a04661c7c}*SharedItemsImports = 4
 		..\..\..\MDK_Projects\Shared Projects\HaE WeaponUtils\HaE WeaponUtils.projitems*{93bc67cd-bee9-4422-b847-ba2a04661c7c}*SharedItemsImports = 4
 		..\..\..\MDK_Projects\Shared Projects\EntityTrackingModule\EntityTrackingModule.projitems*{bfa2687a-1112-44df-bc64-f0fc7f2a1d32}*SharedItemsImports = 13

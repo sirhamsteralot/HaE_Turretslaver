@@ -21,7 +21,20 @@ namespace IngameScript
     {
         public class RotorTurret
         {
+            public IMyTerminalBlock referenceDir;
+            public IMyMotorStator azimuth;
+            public List<IMyMotorStator> elevationRotors;
 
+
+            public void AimAtTarget(Vector3D desiredDirection)
+            {
+                RotorUtils.PointRotorAtVector(azimuth, desiredDirection, referenceDir.WorldMatrix.Forward);
+
+                foreach(var elevation in elevationRotors)
+                {
+                    RotorUtils.PointRotorAtVector(elevation, desiredDirection, referenceDir.WorldMatrix.Forward);
+                }
+            }
         }
     }
 }
