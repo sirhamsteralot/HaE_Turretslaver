@@ -90,10 +90,10 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="MDKUtilities">
-      <HintPath>C:\Users\SirHa\AppData\Local\Microsoft\VisualStudio\15.0_d85c6838\Extensions\kpsbcfli.o4q\MDKUtilities.dll</HintPath>
+      <HintPath>C:\Users\SirHa\AppData\Local\Microsoft\VisualStudio\15.0_d85c6838\Extensions\kupa3tug.o35\MDKUtilities.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Analyzer Include="C:\Users\SirHa\AppData\Local\Microsoft\VisualStudio\15.0_d85c6838\Extensions\kpsbcfli.o4q\Analyzers\MDKAnalyzer.dll" />
+    <Analyzer Include="C:\Users\SirHa\AppData\Local\Microsoft\VisualStudio\15.0_d85c6838\Extensions\kupa3tug.o35\Analyzers\MDKAnalyzer.dll" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MDK\Bootstrapper.cs" />
@@ -105,6 +105,7 @@
     <AdditionalFiles Include="thumb.png" />
     <AdditionalFiles Include="MDK\whitelist.cache" />
     <Compile Include="RotorControl.cs" />
+    <Compile Include="TurretGroup.cs" />
   </ItemGroup>
   <Import Project="..\..\..\..\MDK_Projects\Shared Projects\EntityTrackingModule\EntityTrackingModule.projitems" Label="Shared" />
   <Import Project="..\..\..\..\MDK_Projects\Shared Projects\HaE GridTerminalSystemUtils\HaE GridTerminalSystemUtils.projitems" Label="Shared" />

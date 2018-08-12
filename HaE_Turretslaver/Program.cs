@@ -18,7 +18,7 @@ using VRageMath;
 namespace IngameScript
 {
     partial class Program : MyGridProgram
-    { 
+    {
 
         public Program() {
 

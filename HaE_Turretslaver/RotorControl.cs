@@ -19,12 +19,18 @@ namespace IngameScript
 {
     partial class Program
     {
-        public class RotorTurret
+        public class RotorControl
         {
             public IMyTerminalBlock referenceDir;
             public IMyMotorStator azimuth;
             public List<IMyMotorStator> elevationRotors;
 
+            public RotorControl(IMyTerminalBlock referenceDir, IMyMotorStator azimuth, List<IMyMotorStator> elevationRotors)
+            {
+                this.referenceDir = referenceDir;
+                this.azimuth = azimuth;
+                this.elevationRotors = elevationRotors;
+            }
 
             public void AimAtTarget(Vector3D desiredDirection)
             {
