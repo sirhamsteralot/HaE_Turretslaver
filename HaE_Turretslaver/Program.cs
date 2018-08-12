@@ -19,9 +19,13 @@ namespace IngameScript
 {
     partial class Program : MyGridProgram
     {
-
+        TurretGroup turretGroup;
         public Program() {
+            IMyBlockGroup group = GridTerminalSystem.GetBlockGroupWithName("Test");
 
+            turretGroup = new TurretGroup(group, "[Azimuth]", "[Elevation]", "[CannonBase]");
+
+            Runtime.UpdateFrequency = UpdateFrequency.Update1;
         }
 
         public void Save()
@@ -31,7 +35,7 @@ namespace IngameScript
 
         public void Main(string argument, UpdateType updateSource)
         {
-
+            turretGroup.SetTarget(Vector3D.Normalize(Vector3D.Zero - Me.GetPosition()));
         }
     }
 }

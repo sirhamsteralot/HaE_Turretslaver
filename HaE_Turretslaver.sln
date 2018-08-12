@@ -15,13 +15,17 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "HaE GridTerminalSystemUtils
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "HaE RotorUtils", "..\..\..\MDK_Projects\Shared Projects\HaE RotorUtils\HaE RotorUtils.shproj", "{D30F4BBF-D20E-4571-966A-49E43BC62D47}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "HaE Scheduler", "..\..\..\MDK_Projects\Shared Projects\HaE Scheduler\HaE Scheduler.shproj", "{32A2473A-3095-4B7B-8362-456C72003FEB}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		..\..\..\MDK_Projects\Shared Projects\HaE Targeting\HaE Targeting.projitems*{2c0b9aab-8c08-40ef-a9f4-980dba0e4b11}*SharedItemsImports = 13
+		..\..\..\MDK_Projects\Shared Projects\HaE Scheduler\HaE Scheduler.projitems*{32a2473a-3095-4b7b-8362-456c72003feb}*SharedItemsImports = 13
 		..\..\..\MDK_Projects\Shared Projects\HaE WeaponUtils\HaE WeaponUtils.projitems*{57c7e733-954e-4755-8b80-e73b91fb4a6f}*SharedItemsImports = 13
 		..\..\..\MDK_Projects\Shared Projects\EntityTrackingModule\EntityTrackingModule.projitems*{93bc67cd-bee9-4422-b847-ba2a04661c7c}*SharedItemsImports = 4
 		..\..\..\MDK_Projects\Shared Projects\HaE GridTerminalSystemUtils\HaE GridTerminalSystemUtils.projitems*{93bc67cd-bee9-4422-b847-ba2a04661c7c}*SharedItemsImports = 4
 		..\..\..\MDK_Projects\Shared Projects\HaE RotorUtils\HaE RotorUtils.projitems*{93bc67cd-bee9-4422-b847-ba2a04661c7c}*SharedItemsImports = 4
+		..\..\..\MDK_Projects\Shared Projects\HaE Scheduler\HaE Scheduler.projitems*{93bc67cd-bee9-4422-b847-ba2a04661c7c}*SharedItemsImports = 4
 		..\..\..\MDK_Projects\Shared Projects\HaE Targeting\HaE Targeting.projitems*{93bc67cd-bee9-4422-b847-ba2a04661c7c}*SharedItemsImports = 4
 		..\..\..\MDK_Projects\Shared Projects\HaE WeaponUtils\HaE WeaponUtils.projitems*{93bc67cd-bee9-4422-b847-ba2a04661c7c}*SharedItemsImports = 4
 		..\..\..\MDK_Projects\Shared Projects\EntityTrackingModule\EntityTrackingModule.projitems*{bfa2687a-1112-44df-bc64-f0fc7f2a1d32}*SharedItemsImports = 13

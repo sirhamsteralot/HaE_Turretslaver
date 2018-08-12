@@ -5,3 +5,4 @@
 - HaE Targeting
 - HaE WeaponUtils
 - HaE RotorUtils
+- HaE Scheduler
