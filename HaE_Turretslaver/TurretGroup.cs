@@ -21,6 +21,8 @@ namespace IngameScript
     {
         public class TurretGroup
         {
+            Vector3D currentTargetDir;
+
             RotorControl rotorControl;
             List<RotorLauncher> launchers = new List<RotorLauncher>();
 
@@ -44,9 +46,15 @@ namespace IngameScript
                 }
             }
 
+            public void Tick()
+            {
+                if (currentTargetDir != Vector3D.Zero)
+                    rotorControl.AimAtTarget(currentTargetDir);
+            }
+
             public void SetTarget(Vector3D targetDirection)
             {
-
+                currentTargetDir = targetDirection;
             }
         }
     }
