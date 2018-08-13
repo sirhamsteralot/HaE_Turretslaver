@@ -22,6 +22,9 @@ namespace IngameScript
         public class TurretGroup
         {
             Vector3D currentTargetDir;
+            Vector3D defaultDir;
+            bool cannonsOnTarget;
+            int salvoSize = 5;
 
             RotorControl rotorControl;
             List<RotorLauncher> launchers = new List<RotorLauncher>();
@@ -33,19 +36,20 @@ namespace IngameScript
 
                 List<IMyMotorStator> elevation = rotors.Where(x => x.CustomName.Contains(elevationTag)).ToList();
                 IMyMotorStator azimuth = rotors.First(x => x.CustomName.Contains(azimuthTag));
+                defaultDir = azimuth.WorldMatrix.Forward;
 
                 List<IMyMotorStator> cannonBases = Select(elevation);
 
                 List<RotorControl.RotorReferencePair> elevationPairs = new List<RotorControl.RotorReferencePair>();
                 for(int i = 0; i < elevation.Count; i++)
                 {
-                    P.Echo($"cannonbases: {cannonBases.Count} {i}");
                     elevationPairs.Add(new RotorControl.RotorReferencePair { rotor = elevation[i], reference = cannonBases[i] });
                 }
 
                 RotorControl.RotorReferencePair azimuthPair = new RotorControl.RotorReferencePair { rotor = azimuth, reference = cannonBases[0]};
 
                 rotorControl = new RotorControl(azimuthPair, elevationPairs);
+                rotorControl.onTarget = OnTarget;
 
                 foreach (var cannonbase in cannonBases)
                 {
@@ -56,13 +60,36 @@ namespace IngameScript
 
             public void Tick()
             {
-                if (currentTargetDir != Vector3D.Zero)
-                    rotorControl.AimAtTarget(currentTargetDir);
+                if (currentTargetDir == Vector3D.Zero)
+                {
+                    rotorControl.AimAtTarget(defaultDir);
+                }
+
+                rotorControl.AimAtTarget(currentTargetDir);
+                foreach (var gun in launchers)
+                    gun.Tick();
             }
 
             public void SetTarget(Vector3D targetDirection)
             {
                 currentTargetDir = targetDirection;
+            }
+
+            public void FireCannons()
+            {
+                foreach (var cannon in launchers)
+                    cannon.Salvo(salvoSize);
+            }
+
+            private void OnTarget(bool val)
+            {
+                if (val == cannonsOnTarget)
+                    return;
+
+                cannonsOnTarget = val;
+
+                if (val)
+                    FireCannons();
             }
 
             private List<IMyMotorStator> Select(List<IMyMotorStator> elevation)

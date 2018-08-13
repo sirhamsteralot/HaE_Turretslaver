@@ -6,3 +6,4 @@
 - HaE WeaponUtils
 - HaE RotorUtils
 - HaE Scheduler
+- HaE MathUtils

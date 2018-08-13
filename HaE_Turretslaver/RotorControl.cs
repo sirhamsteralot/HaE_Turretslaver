@@ -21,6 +21,8 @@ namespace IngameScript
     {
         public class RotorControl
         {
+            public Action<bool> onTarget;
+
             public RotorReferencePair azimuth;
             public List<RotorReferencePair> elevationRotors;
 
@@ -32,11 +34,28 @@ namespace IngameScript
 
             public void AimAtTarget(Vector3D desiredDirection)
             {
-                RotorUtils.PointRotorAtVector(azimuth.rotor, desiredDirection, azimuth.reference.WorldMatrix.Up);
+                Vector3D refDirAz = azimuth.reference.WorldMatrix.Up;
+                RotorUtils.PointRotorAtVector(azimuth.rotor, desiredDirection, refDirAz);
 
-                foreach(var elevation in elevationRotors)
+                foreach (var elevation in elevationRotors)
                 {
-                    RotorUtils.PointRotorAtVector(elevation.rotor, -desiredDirection, elevation.reference.WorldMatrix.Up);
+                    var refDirEl = elevation.reference.WorldMatrix.Up;
+                    RotorUtils.PointRotorAtVector(elevation.rotor, -desiredDirection, refDirEl);
+
+                    CheckSetTarget(desiredDirection, refDirEl, elevation.rotor);
+                }
+            }
+
+            private void CheckSetTarget(Vector3D desiredDir, Vector3D currentDir, IMyMotorStator rotor)
+            {
+                double dot = Vector3D.Dot(currentDir, desiredDir);
+                if (dot > 0.999)
+                {
+                    onTarget?.Invoke(true);
+                }
+                else
+                {
+                    onTarget?.Invoke(false);
                 }
             }
 
