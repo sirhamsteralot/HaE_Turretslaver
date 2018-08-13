@@ -26,7 +26,7 @@ namespace IngameScript
             RotorControl rotorControl;
             List<RotorLauncher> launchers = new List<RotorLauncher>();
 
-            public TurretGroup(IMyBlockGroup turretGroup, string azimuthTag, string elevationTag, string cannonBaseTag)
+            public TurretGroup(IMyBlockGroup turretGroup, string azimuthTag, string elevationTag)
             {
                 var rotors = new List<IMyMotorStator>();
                 turretGroup.GetBlocksOfType(rotors);
@@ -34,10 +34,18 @@ namespace IngameScript
                 List<IMyMotorStator> elevation = rotors.Where(x => x.CustomName.Contains(elevationTag)).ToList();
                 IMyMotorStator azimuth = rotors.First(x => x.CustomName.Contains(azimuthTag));
 
-                List<IMyMotorStator> cannonBases = rotors.Where(x => x.CustomName.Contains(cannonBaseTag)).ToList();
+                List<IMyMotorStator> cannonBases = Select(elevation);
 
+                List<RotorControl.RotorReferencePair> elevationPairs = new List<RotorControl.RotorReferencePair>();
+                for(int i = 0; i < elevation.Count; i++)
+                {
+                    P.Echo($"cannonbases: {cannonBases.Count} {i}");
+                    elevationPairs.Add(new RotorControl.RotorReferencePair { rotor = elevation[i], reference = cannonBases[i] });
+                }
 
-                rotorControl = new RotorControl(cannonBases[0], azimuth, elevation);
+                RotorControl.RotorReferencePair azimuthPair = new RotorControl.RotorReferencePair { rotor = azimuth, reference = cannonBases[0]};
+
+                rotorControl = new RotorControl(azimuthPair, elevationPairs);
 
                 foreach (var cannonbase in cannonBases)
                 {
@@ -55,6 +63,21 @@ namespace IngameScript
             public void SetTarget(Vector3D targetDirection)
             {
                 currentTargetDir = targetDirection;
+            }
+
+            private List<IMyMotorStator> Select(List<IMyMotorStator> elevation)
+            {
+                var tmplist = new List<IMyMotorStator>();
+
+                for(int i = 0; i < elevation.Count; i++)
+                {
+                    var tmpRot = RotorLauncher.Selector(elevation[i].TopGrid);
+                    if (tmpRot != null)
+                        tmplist.Add(tmpRot);
+                    else
+                        elevation.RemoveAt(i);
+                }
+                return tmplist;
             }
         }
     }

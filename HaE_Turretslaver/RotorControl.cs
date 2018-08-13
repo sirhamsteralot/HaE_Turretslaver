@@ -21,25 +21,29 @@ namespace IngameScript
     {
         public class RotorControl
         {
-            public IMyTerminalBlock referenceDir;
-            public IMyMotorStator azimuth;
-            public List<IMyMotorStator> elevationRotors;
+            public RotorReferencePair azimuth;
+            public List<RotorReferencePair> elevationRotors;
 
-            public RotorControl(IMyTerminalBlock referenceDir, IMyMotorStator azimuth, List<IMyMotorStator> elevationRotors)
+            public RotorControl(RotorReferencePair azimuth, List<RotorReferencePair> elevationRotors)
             {
-                this.referenceDir = referenceDir;
                 this.azimuth = azimuth;
                 this.elevationRotors = elevationRotors;
             }
 
             public void AimAtTarget(Vector3D desiredDirection)
             {
-                RotorUtils.PointRotorAtVector(azimuth, desiredDirection, referenceDir.WorldMatrix.Forward);
+                RotorUtils.PointRotorAtVector(azimuth.rotor, desiredDirection, azimuth.reference.WorldMatrix.Up);
 
                 foreach(var elevation in elevationRotors)
                 {
-                    RotorUtils.PointRotorAtVector(elevation, desiredDirection, referenceDir.WorldMatrix.Forward);
+                    RotorUtils.PointRotorAtVector(elevation.rotor, -desiredDirection, elevation.reference.WorldMatrix.Up);
                 }
+            }
+
+            public struct RotorReferencePair
+            {
+                public IMyMotorStator rotor;
+                public IMyTerminalBlock reference;
             }
         }
     }
