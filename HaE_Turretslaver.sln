@@ -19,11 +19,14 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "HaE Scheduler", "..\..\..\M
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "HaE MathUtils", "..\..\..\MDK_Projects\Shared Projects\VectorUtils\HaE MathUtils.shproj", "{2D034700-8C67-41B0-B3C8-5510D21E52C3}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "HaE Timing", "..\..\..\MDK_Projects\Shared Projects\HaE Timing\HaE Timing.shproj", "{36C0DEEB-8ADE-4156-AEA7-9DF3C620F474}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		..\..\..\MDK_Projects\Shared Projects\HaE Targeting\HaE Targeting.projitems*{2c0b9aab-8c08-40ef-a9f4-980dba0e4b11}*SharedItemsImports = 13
 		..\..\..\MDK_Projects\Shared Projects\VectorUtils\VectorUtils.projitems*{2d034700-8c67-41b0-b3c8-5510d21e52c3}*SharedItemsImports = 13
 		..\..\..\MDK_Projects\Shared Projects\HaE Scheduler\HaE Scheduler.projitems*{32a2473a-3095-4b7b-8362-456c72003feb}*SharedItemsImports = 13
+		..\..\..\MDK_Projects\Shared Projects\HaE Timing\HaE Timing.projitems*{36c0deeb-8ade-4156-aea7-9df3c620f474}*SharedItemsImports = 13
 		..\..\..\MDK_Projects\Shared Projects\HaE WeaponUtils\HaE WeaponUtils.projitems*{57c7e733-954e-4755-8b80-e73b91fb4a6f}*SharedItemsImports = 13
 		..\..\..\MDK_Projects\Shared Projects\EntityTrackingModule\EntityTrackingModule.projitems*{93bc67cd-bee9-4422-b847-ba2a04661c7c}*SharedItemsImports = 4
 		..\..\..\MDK_Projects\Shared Projects\HaE GridTerminalSystemUtils\HaE GridTerminalSystemUtils.projitems*{93bc67cd-bee9-4422-b847-ba2a04661c7c}*SharedItemsImports = 4

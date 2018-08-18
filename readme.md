@@ -7,3 +7,4 @@
 - HaE RotorUtils
 - HaE Scheduler
 - HaE MathUtils
+- HaE Timing
