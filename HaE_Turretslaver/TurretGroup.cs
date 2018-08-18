@@ -22,7 +22,7 @@ namespace IngameScript
         public class TurretGroup
         {
             Vector3D currentTargetDir;
-            Vector3D defaultDir;
+            public Vector3D defaultDir;
             bool cannonsOnTarget;
             int salvoSize = 5;
 

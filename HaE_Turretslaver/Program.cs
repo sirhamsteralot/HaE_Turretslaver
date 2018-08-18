@@ -73,13 +73,13 @@ namespace IngameScript
 
         public void OnTargetSolved(Vector3D targetPos)
         {
-            Echo($"targeting position: {targetPos}");
             turretGroup.TargetPosition(targetPos);
         }
 
         public void OnTargetingFail()
         {
             turretGroup.TargetDirection(Vector3D.Zero);
+            turretGroup.defaultDir = gridCannonTargeting.simTargeting.firingDirection;
         }
     }
 }
