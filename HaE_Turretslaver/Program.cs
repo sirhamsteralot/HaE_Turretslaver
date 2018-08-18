@@ -24,6 +24,7 @@ namespace IngameScript
         TurretGroup turretGroup;
         EntityTracking_Module targetTracker;
         GridCannonTargeting gridCannonTargeting;
+        IngameTime ingameTime;
 
 
         IMyShipController control;
@@ -33,16 +34,18 @@ namespace IngameScript
             P = this;
 
             var GTSUtils = new GridTerminalSystemUtils(Me, GridTerminalSystem);
+            ingameTime = new IngameTime();
 
             IMyBlockGroup group = GridTerminalSystem.GetBlockGroupWithName("Test");
             control = GridTerminalSystem.GetBlockWithName("RC") as IMyShipController;
 
-            turretGroup = new TurretGroup(group, "[Azimuth]", "[Elevation]");
+            turretGroup = new TurretGroup(group, ingameTime, "[Azimuth]", "[Elevation]");
             targetTracker = new EntityTracking_Module(GTSUtils, control, null);
             targetTracker.onEntityDetected += OnEntityDetected;
             gridCannonTargeting = new GridCannonTargeting(control, 100, true);
             gridCannonTargeting.onRoutineFinish += OnTargetSolved;
             gridCannonTargeting.onRoutineFail += OnTargetingFail;
+            
 
             Runtime.UpdateFrequency = UpdateFrequency.Update1 | UpdateFrequency.Update10;
         }
@@ -58,8 +61,8 @@ namespace IngameScript
                 targetTracker.Poll();
 
             gridCannonTargeting.Tick();
-            
             turretGroup.Tick();
+            ingameTime.Tick(Runtime.TimeSinceLastRun);
         }
 
         public void OnEntityDetected(HaE_Entity entity)

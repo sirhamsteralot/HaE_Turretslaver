@@ -29,7 +29,7 @@ namespace IngameScript
             RotorControl rotorControl;
             List<RotorLauncher> launchers = new List<RotorLauncher>();
 
-            public TurretGroup(IMyBlockGroup turretGroup, string azimuthTag, string elevationTag)
+            public TurretGroup(IMyBlockGroup turretGroup, IngameTime ingameTime, string azimuthTag, string elevationTag)
             {
                 var rotors = new List<IMyMotorStator>();
                 turretGroup.GetBlocksOfType(rotors);
@@ -53,7 +53,7 @@ namespace IngameScript
 
                 foreach (var cannonbase in cannonBases)
                 {
-                    var launcher = new RotorLauncher(cannonbase);
+                    var launcher = new RotorLauncher(cannonbase, ingameTime, 1);
                     launchers.Add(launcher);
                 }
             }
