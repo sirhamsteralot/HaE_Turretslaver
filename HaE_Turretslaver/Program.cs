@@ -22,15 +22,29 @@ namespace IngameScript
         public static Program P;
 
         TurretGroup turretGroup;
+        EntityTracking_Module targetTracker;
+        GridCannonTargeting gridCannonTargeting;
+
+
+        IMyShipController control;
+
+
         public Program() {
             P = this;
 
+            var GTSUtils = new GridTerminalSystemUtils(Me, GridTerminalSystem);
+
             IMyBlockGroup group = GridTerminalSystem.GetBlockGroupWithName("Test");
+            control = GridTerminalSystem.GetBlockWithName("RC") as IMyShipController;
 
             turretGroup = new TurretGroup(group, "[Azimuth]", "[Elevation]");
-            turretGroup.SetTarget(Vector3D.Normalize(Vector3D.Zero - Me.GetPosition()));
+            targetTracker = new EntityTracking_Module(GTSUtils, control, null);
+            targetTracker.onEntityDetected += OnEntityDetected;
+            gridCannonTargeting = new GridCannonTargeting(control, 100, true);
+            gridCannonTargeting.onRoutineFinish += OnTargetSolved;
+            gridCannonTargeting.onRoutineFail += OnTargetingFail;
 
-            Runtime.UpdateFrequency = UpdateFrequency.Update1;
+            Runtime.UpdateFrequency = UpdateFrequency.Update1 | UpdateFrequency.Update10;
         }
 
         public void Save()
@@ -40,7 +54,29 @@ namespace IngameScript
 
         public void Main(string argument, UpdateType updateSource)
         {
+            if ((updateSource & UpdateType.Update10) != 0)
+                targetTracker.Poll();
+
+            gridCannonTargeting.Tick();
+            
             turretGroup.Tick();
+        }
+
+        public void OnEntityDetected(HaE_Entity entity)
+        {
+            //Echo($"Targeting {entity.entityInfo.EntityId}");
+            gridCannonTargeting.NewTarget(entity.entityInfo);
+        }
+
+        public void OnTargetSolved(Vector3D targetPos)
+        {
+            Echo($"targeting position: {targetPos}");
+            turretGroup.TargetPosition(targetPos);
+        }
+
+        public void OnTargetingFail()
+        {
+            turretGroup.TargetDirection(Vector3D.Zero);
         }
     }
 }

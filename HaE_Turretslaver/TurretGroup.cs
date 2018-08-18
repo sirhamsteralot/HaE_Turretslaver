@@ -63,6 +63,7 @@ namespace IngameScript
                 if (currentTargetDir == Vector3D.Zero)
                 {
                     rotorControl.AimAtTarget(defaultDir);
+                    return;
                 }
 
                 rotorControl.AimAtTarget(currentTargetDir);
@@ -70,9 +71,15 @@ namespace IngameScript
                     gun.Tick();
             }
 
-            public void SetTarget(Vector3D targetDirection)
+            public void TargetDirection(Vector3D targetDirection)
             {
                 currentTargetDir = targetDirection;
+            }
+
+            public void TargetPosition(Vector3D position)
+            {
+                Vector3D targetdir = Vector3D.Normalize(position - rotorControl.azimuth.rotor.GetPosition());
+                TargetDirection(targetdir);
             }
 
             public void FireCannons()
