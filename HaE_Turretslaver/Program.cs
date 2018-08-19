@@ -73,6 +73,7 @@ namespace IngameScript
 
         public void OnTargetSolved(Vector3D targetPos)
         {
+            Echo("fiaaaah!");
             turretGroup.TargetPosition(targetPos);
         }
 

@@ -25,6 +25,7 @@ namespace IngameScript
             public Vector3D defaultDir;
             bool cannonsOnTarget;
             int salvoSize = 5;
+            double salvoTimeout = 2.5;
 
             RotorControl rotorControl;
             List<RotorLauncher> launchers = new List<RotorLauncher>();
@@ -53,7 +54,7 @@ namespace IngameScript
 
                 foreach (var cannonbase in cannonBases)
                 {
-                    var launcher = new RotorLauncher(cannonbase, ingameTime, 1);
+                    var launcher = new RotorLauncher(cannonbase, ingameTime, salvoTimeout);
                     launchers.Add(launcher);
                 }
             }
@@ -90,11 +91,6 @@ namespace IngameScript
 
             private void OnTarget(bool val)
             {
-                if (val == cannonsOnTarget)
-                    return;
-
-                cannonsOnTarget = val;
-
                 if (val)
                     FireCannons();
             }
