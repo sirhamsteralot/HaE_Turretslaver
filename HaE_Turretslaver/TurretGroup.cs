@@ -24,14 +24,17 @@ namespace IngameScript
             Vector3D currentTargetDir;
             public Vector3D defaultDir;
             bool cannonsOnTarget;
-            int salvoSize = 5;
+            int salvoSize = 3;
             double salvoTimeout = 2.5;
 
             RotorControl rotorControl;
             List<RotorLauncher> launchers = new List<RotorLauncher>();
+            IngameTime ingameTime;
 
             public TurretGroup(IMyBlockGroup turretGroup, IngameTime ingameTime, string azimuthTag, string elevationTag)
             {
+                this.ingameTime = ingameTime;
+
                 var rotors = new List<IMyMotorStator>();
                 turretGroup.GetBlocksOfType(rotors);
 

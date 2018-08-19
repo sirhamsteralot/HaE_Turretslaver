@@ -42,7 +42,7 @@ namespace IngameScript
             turretGroup = new TurretGroup(group, ingameTime, "[Azimuth]", "[Elevation]");
             targetTracker = new EntityTracking_Module(GTSUtils, control, null);
             targetTracker.onEntityDetected += OnEntityDetected;
-            gridCannonTargeting = new GridCannonTargeting(control, 100, true);
+            gridCannonTargeting = new GridCannonTargeting(control, ingameTime, 100);
             gridCannonTargeting.onRoutineFinish += OnTargetSolved;
             gridCannonTargeting.onRoutineFail += OnTargetingFail;
             
