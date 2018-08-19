@@ -73,14 +73,23 @@ namespace IngameScript
 
         public void OnTargetSolved(Vector3D targetPos)
         {
-            Echo("fiaaaah!");
             turretGroup.TargetPosition(targetPos);
         }
 
         public void OnTargetingFail()
         {
             turretGroup.TargetDirection(Vector3D.Zero);
-            turretGroup.defaultDir = gridCannonTargeting.simTargeting.firingDirection;
+
+            if (gridCannonTargeting.simTargeting != null)
+            {
+                Vector3D currentSimDir = gridCannonTargeting.simTargeting.firingDirection;
+
+                if (currentSimDir != Vector3D.Zero)
+                    turretGroup.defaultDir = currentSimDir;
+                else
+                    turretGroup.defaultDir = control.WorldMatrix.Forward;
+            }
+
         }
     }
 }

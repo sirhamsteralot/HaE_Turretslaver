@@ -64,6 +64,9 @@ namespace IngameScript
 
             public void Tick()
             {
+                foreach (var gun in launchers)
+                    gun.Tick();
+
                 if (currentTargetDir == Vector3D.Zero)
                 {
                     rotorControl.AimAtTarget(defaultDir);
@@ -71,8 +74,6 @@ namespace IngameScript
                 }
 
                 rotorControl.AimAtTarget(currentTargetDir);
-                foreach (var gun in launchers)
-                    gun.Tick();
             }
 
             public void TargetDirection(Vector3D targetDirection)
