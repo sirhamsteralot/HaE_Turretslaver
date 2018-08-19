@@ -95,7 +95,7 @@ namespace IngameScript
 
             private void OnTarget(bool val)
             {
-                if (val)
+                if (val && currentTargetDir != Vector3D.Zero)
                     FireCannons();
             }
 
