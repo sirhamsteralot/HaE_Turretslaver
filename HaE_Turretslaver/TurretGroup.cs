@@ -31,12 +31,24 @@ namespace IngameScript
             List<RotorLauncher> launchers = new List<RotorLauncher>();
             IngameTime ingameTime;
 
+            public TurretGroup(List<IMyMotorStator> rotors, IngameTime ingameTime, string azimuthTag, string elevationTag)
+            {
+                Setup(rotors, ingameTime, azimuthTag, elevationTag);
+            }
+
             public TurretGroup(IMyBlockGroup turretGroup, IngameTime ingameTime, string azimuthTag, string elevationTag)
             {
                 this.ingameTime = ingameTime;
 
                 var rotors = new List<IMyMotorStator>();
                 turretGroup.GetBlocksOfType(rotors);
+
+                Setup (rotors, ingameTime, azimuthTag, elevationTag);
+            }
+
+            public void Setup(List<IMyMotorStator> rotors, IngameTime ingameTime, string azimuthTag, string elevationTag)
+            {
+                this.ingameTime = ingameTime;
 
                 List<IMyMotorStator> elevation = rotors.Where(x => x.CustomName.Contains(elevationTag)).ToList();
                 IMyMotorStator azimuth = rotors.First(x => x.CustomName.Contains(azimuthTag));
@@ -45,12 +57,12 @@ namespace IngameScript
                 List<IMyMotorStator> cannonBases = Select(elevation);
 
                 List<RotorControl.RotorReferencePair> elevationPairs = new List<RotorControl.RotorReferencePair>();
-                for(int i = 0; i < elevation.Count; i++)
+                for (int i = 0; i < elevation.Count; i++)
                 {
                     elevationPairs.Add(new RotorControl.RotorReferencePair { rotor = elevation[i], reference = cannonBases[i] });
                 }
 
-                RotorControl.RotorReferencePair azimuthPair = new RotorControl.RotorReferencePair { rotor = azimuth, reference = cannonBases[0]};
+                RotorControl.RotorReferencePair azimuthPair = new RotorControl.RotorReferencePair { rotor = azimuth, reference = cannonBases[0] };
 
                 rotorControl = new RotorControl(azimuthPair, elevationPairs);
                 rotorControl.onTarget = OnTarget;
