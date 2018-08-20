@@ -21,12 +21,13 @@ namespace IngameScript
     {
         public class TurretGroup
         {
-            Vector3D currentTargetDir;
             public Vector3D defaultDir;
-            bool cannonsOnTarget;
+            public bool restMode = false;
+
+            Vector3D currentTargetDir;
             int salvoSize = 3;
             double salvoTimeout = 2.5;
-
+            
             RotorControl rotorControl;
             List<RotorLauncher> launchers = new List<RotorLauncher>();
             IngameTime ingameTime;
@@ -38,8 +39,6 @@ namespace IngameScript
 
             public TurretGroup(IMyBlockGroup turretGroup, IngameTime ingameTime, string azimuthTag, string elevationTag)
             {
-                this.ingameTime = ingameTime;
-
                 var rotors = new List<IMyMotorStator>();
                 turretGroup.GetBlocksOfType(rotors);
 
@@ -76,6 +75,9 @@ namespace IngameScript
 
             public void Tick()
             {
+                if (restMode)
+                    return;
+
                 foreach (var gun in launchers)
                     gun.Tick();
 
@@ -91,6 +93,7 @@ namespace IngameScript
             public void TargetDirection(Vector3D targetDirection)
             {
                 currentTargetDir = targetDirection;
+                restMode = false;
             }
 
             public void TargetPosition(Vector3D position)
@@ -101,14 +104,33 @@ namespace IngameScript
 
             public void FireCannons()
             {
+                restMode = false;
+
                 foreach (var cannon in launchers)
                     cannon.Salvo(salvoSize);
             }
 
             private void OnTarget(bool val)
             {
-                if (val && currentTargetDir != Vector3D.Zero)
-                    FireCannons();
+                if (val)
+                {
+                    if (currentTargetDir != Vector3D.Zero)
+                    {
+                        FireCannons();
+                        rotorControl.Lock(false);
+                        return;
+                    }
+                    
+                    if (rotorControl.currentAccuracy > 0.9999)
+                    {
+                        rotorControl.Lock(true);
+                        restMode = true;
+                    }
+                        
+                } else if (currentTargetDir != Vector3D.Zero)
+                {
+                    rotorControl.Lock(false);
+                }
             }
 
             private List<IMyMotorStator> Select(List<IMyMotorStator> elevation)

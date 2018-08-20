@@ -22,6 +22,7 @@ namespace IngameScript
         public class RotorControl
         {
             public Action<bool> onTarget;
+            public double currentAccuracy = double.MaxValue;
 
             public RotorReferencePair azimuth;
             public List<RotorReferencePair> elevationRotors;
@@ -46,10 +47,20 @@ namespace IngameScript
                 }
             }
 
+            public void Lock(bool val)
+            {
+                azimuth.rotor.RotorLock = val;
+
+                foreach (var elevation in elevationRotors)
+                {
+                    elevation.rotor.RotorLock = val;
+                }
+            }
+
             private void CheckSetTarget(Vector3D desiredDir, Vector3D currentDir, IMyMotorStator rotor)
             {
-                double dot = Vector3D.Dot(currentDir, desiredDir);
-                if (dot > 0.999)
+                currentAccuracy = Vector3D.Dot(currentDir, desiredDir);
+                if (currentAccuracy > 0.999)
                 {
                     onTarget?.Invoke(true);
                 }

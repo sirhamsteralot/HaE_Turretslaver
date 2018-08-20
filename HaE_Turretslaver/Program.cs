@@ -19,7 +19,7 @@ namespace IngameScript
 {
     partial class Program : MyGridProgram
     {
-        public static Program P;
+        public const bool DEBUG = true;
 
         TurretGroup turretGroup;
         EntityTracking_Module targetTracker;
@@ -31,8 +31,6 @@ namespace IngameScript
 
 
         public Program() {
-            P = this;
-
             var GTSUtils = new GridTerminalSystemUtils(Me, GridTerminalSystem);
             ingameTime = new IngameTime();
 
@@ -45,29 +43,63 @@ namespace IngameScript
             gridCannonTargeting = new GridCannonTargeting(control, ingameTime, 100);
             gridCannonTargeting.onRoutineFinish += OnTargetSolved;
             gridCannonTargeting.onRoutineFail += OnTargetingFail;
-            
+            gridCannonTargeting.onTargetTimeout += OnTargetTimeout;
+
+            turretGroup.TargetDirection(Vector3D.Zero);
+            turretGroup.defaultDir = control.WorldMatrix.Forward;
 
             Runtime.UpdateFrequency = UpdateFrequency.Update1 | UpdateFrequency.Update10;
         }
 
-        public void Save()
-        {
 
-        }
-
+        double averageTotalInstructionCount;
+        double averageTargetTrackerInstructionCount;
+        double averageGridTargetingInstructionCount;
+        double averageTurretGroupInstructionCount;
         public void Main(string argument, UpdateType updateSource)
         {
+            if (DEBUG)
+            {
+                int tempCount = Runtime.CurrentInstructionCount;
+                if ((updateSource & UpdateType.Update10) != 0)
+                    targetTracker.Poll();
+                tempCount = Runtime.CurrentInstructionCount - tempCount;
+                averageTargetTrackerInstructionCount = tempCount * 0.01 + averageTargetTrackerInstructionCount * 0.99;
+
+                tempCount = Runtime.CurrentInstructionCount;
+                gridCannonTargeting.Tick();
+                tempCount = Runtime.CurrentInstructionCount - tempCount;
+                averageGridTargetingInstructionCount = tempCount * 0.01 + averageGridTargetingInstructionCount * 0.99;
+
+                tempCount = Runtime.CurrentInstructionCount;
+                turretGroup.Tick();
+                tempCount = Runtime.CurrentInstructionCount - tempCount;
+                averageTurretGroupInstructionCount = tempCount * 0.01 + averageTurretGroupInstructionCount * 0.99;
+
+                ingameTime.Tick(Runtime.TimeSinceLastRun);
+
+                Echo($"turret restMode:  {turretGroup.restMode}");
+                Echo($"target restMode:  {gridCannonTargeting.restMode}");
+
+                averageTotalInstructionCount = Runtime.CurrentInstructionCount * 0.01 + averageTotalInstructionCount * 0.99;
+                Echo($"\nComplexity:\nTotal: {averageTotalInstructionCount: #.##}\nTargetTracker: {averageTargetTrackerInstructionCount: #.##}\nGridTargeting: {averageGridTargetingInstructionCount: #.##}\nTurretGroup: {averageTurretGroupInstructionCount: #.##}");
+                Echo($"\nlastRuntime: {Runtime.LastRunTimeMs: #.##}");
+                return;
+            }
+
+            #pragma warning disable
             if ((updateSource & UpdateType.Update10) != 0)
                 targetTracker.Poll();
 
             gridCannonTargeting.Tick();
             turretGroup.Tick();
+
             ingameTime.Tick(Runtime.TimeSinceLastRun);
+            #pragma warning restore
         }
 
         public void OnEntityDetected(HaE_Entity entity)
         {
-            //Echo($"Targeting {entity.entityInfo.EntityId}");
             gridCannonTargeting.NewTarget(entity.entityInfo);
         }
 
@@ -84,12 +116,15 @@ namespace IngameScript
             {
                 Vector3D currentSimDir = gridCannonTargeting.simTargeting.firingDirection;
 
-                if (currentSimDir != Vector3D.Zero)
-                    turretGroup.defaultDir = currentSimDir;
-                else
-                    turretGroup.defaultDir = control.WorldMatrix.Forward;
+                turretGroup.defaultDir = currentSimDir;
             }
 
+        }
+
+        public void OnTargetTimeout()
+        {
+            turretGroup.TargetDirection(Vector3D.Zero);
+            turretGroup.defaultDir = control.WorldMatrix.Forward;
         }
     }
 }
