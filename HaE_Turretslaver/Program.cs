@@ -50,7 +50,7 @@ namespace IngameScript
             turretGroups = new List<TurretGroup>();
 
             #region serializer
-            nameSerializer = new INISerializer("[NameConfig]");
+            nameSerializer = new INISerializer("NameConfig");
 
             nameSerializer.AddValue("turretGroupTag", x => x, "[HaE Turret]");
             nameSerializer.AddValue("azimuthTag", x => x, "[Azimuth]");
@@ -68,6 +68,17 @@ namespace IngameScript
                 nameSerializer.DeSerialize(Me.CustomData);
             }
             #endregion
+            
+            control = GridTerminalSystem.GetBlockWithName(controllerName) as IMyShipController;
+            Echo($"controllerName: |{controllerName}|\ncontrol: {control != null}\n\n");
+
+            targetTracker = new EntityTracking_Module(GTSUtils, control, null);
+            targetTracker.onEntityDetected += OnEntityDetected;
+
+            gridCannonTargeting = new GridCannonTargeting(control, ingameTime, 100);
+            gridCannonTargeting.onRoutineFinish += OnTargetSolved;
+            gridCannonTargeting.onRoutineFail += OnTargetingFail;
+            gridCannonTargeting.onTargetTimeout += OnTargetTimeout;
 
             List<IMyBlockGroup> groups = new List<IMyBlockGroup>();
             GridTerminalSystem.GetBlockGroups(groups, x => x.Name.Contains(turretGroupTag));
@@ -107,6 +118,7 @@ namespace IngameScript
 
                 ingameTime.Tick(Runtime.TimeSinceLastRun);
 
+                Echo($"turretCount: {turretGroups.Count}");
                 Echo($"target restMode:  {gridCannonTargeting.restMode}");
 
                 averageTotalInstructionCount = Runtime.CurrentInstructionCount * 0.01 + averageTotalInstructionCount * 0.99;
@@ -128,17 +140,12 @@ namespace IngameScript
 
         public void AddTurret(IMyBlockGroup group)
         {
+            Echo($"variables:\ngroup: {group != null}\ningameTime: {ingameTime != null}\nazimuthTag: {azimuthTag != null}\nelevationTag: {elevationTag != null}\nturretGroups: {turretGroups != null}\ncontrol: {control != null}");
+
             var turretGroup = new TurretGroup(group, ingameTime, azimuthTag, elevationTag);
-
-            targetTracker = new EntityTracking_Module(GTSUtils, control, null);
-            targetTracker.onEntityDetected += OnEntityDetected;
-            gridCannonTargeting = new GridCannonTargeting(control, ingameTime, 100);
-            gridCannonTargeting.onRoutineFinish += OnTargetSolved;
-            gridCannonTargeting.onRoutineFail += OnTargetingFail;
-            gridCannonTargeting.onTargetTimeout += OnTargetTimeout;
-
             turretGroup.TargetDirection(Vector3D.Zero);
             turretGroup.defaultDir = control.WorldMatrix.Forward;
+            Echo("turretGroup");
 
             turretGroups.Add(turretGroup);
         }
