@@ -140,12 +140,9 @@ namespace IngameScript
 
         public void AddTurret(IMyBlockGroup group)
         {
-            Echo($"variables:\ngroup: {group != null}\ningameTime: {ingameTime != null}\nazimuthTag: {azimuthTag != null}\nelevationTag: {elevationTag != null}\nturretGroups: {turretGroups != null}\ncontrol: {control != null}");
-
             var turretGroup = new TurretGroup(group, ingameTime, azimuthTag, elevationTag);
             turretGroup.TargetDirection(Vector3D.Zero);
             turretGroup.defaultDir = control.WorldMatrix.Forward;
-            Echo("turretGroup");
 
             turretGroups.Add(turretGroup);
         }
