@@ -21,6 +21,8 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "HaE MathUtils", "..\..\..\M
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "HaE Timing", "..\..\..\MDK_Projects\Shared Projects\HaE Timing\HaE Timing.shproj", "{36C0DEEB-8ADE-4156-AEA7-9DF3C620F474}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "HaE Serialization", "..\..\..\MDK_Projects\Shared Projects\HaE Serialization\HaE Serialization.shproj", "{633D8B24-4B3B-4C26-9480-DBA498CC7831}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		..\..\..\MDK_Projects\Shared Projects\HaE Targeting\HaE Targeting.projitems*{2c0b9aab-8c08-40ef-a9f4-980dba0e4b11}*SharedItemsImports = 13
@@ -28,10 +30,12 @@ Global
 		..\..\..\MDK_Projects\Shared Projects\HaE Scheduler\HaE Scheduler.projitems*{32a2473a-3095-4b7b-8362-456c72003feb}*SharedItemsImports = 13
 		..\..\..\MDK_Projects\Shared Projects\HaE Timing\HaE Timing.projitems*{36c0deeb-8ade-4156-aea7-9df3c620f474}*SharedItemsImports = 13
 		..\..\..\MDK_Projects\Shared Projects\HaE WeaponUtils\HaE WeaponUtils.projitems*{57c7e733-954e-4755-8b80-e73b91fb4a6f}*SharedItemsImports = 13
+		..\..\..\MDK_Projects\Shared Projects\HaE Serialization\HaE Serialization.projitems*{633d8b24-4b3b-4c26-9480-dba498cc7831}*SharedItemsImports = 13
 		..\..\..\MDK_Projects\Shared Projects\EntityTrackingModule\EntityTrackingModule.projitems*{93bc67cd-bee9-4422-b847-ba2a04661c7c}*SharedItemsImports = 4
 		..\..\..\MDK_Projects\Shared Projects\HaE GridTerminalSystemUtils\HaE GridTerminalSystemUtils.projitems*{93bc67cd-bee9-4422-b847-ba2a04661c7c}*SharedItemsImports = 4
 		..\..\..\MDK_Projects\Shared Projects\HaE RotorUtils\HaE RotorUtils.projitems*{93bc67cd-bee9-4422-b847-ba2a04661c7c}*SharedItemsImports = 4
 		..\..\..\MDK_Projects\Shared Projects\HaE Scheduler\HaE Scheduler.projitems*{93bc67cd-bee9-4422-b847-ba2a04661c7c}*SharedItemsImports = 4
+		..\..\..\MDK_Projects\Shared Projects\HaE Serialization\HaE Serialization.projitems*{93bc67cd-bee9-4422-b847-ba2a04661c7c}*SharedItemsImports = 4
 		..\..\..\MDK_Projects\Shared Projects\HaE Targeting\HaE Targeting.projitems*{93bc67cd-bee9-4422-b847-ba2a04661c7c}*SharedItemsImports = 4
 		..\..\..\MDK_Projects\Shared Projects\HaE Timing\HaE Timing.projitems*{93bc67cd-bee9-4422-b847-ba2a04661c7c}*SharedItemsImports = 4
 		..\..\..\MDK_Projects\Shared Projects\HaE WeaponUtils\HaE WeaponUtils.projitems*{93bc67cd-bee9-4422-b847-ba2a04661c7c}*SharedItemsImports = 4
