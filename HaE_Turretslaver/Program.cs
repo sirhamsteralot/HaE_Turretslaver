@@ -27,6 +27,8 @@ namespace IngameScript
         public string turretGroupTag { get { return (string)nameSerializer.GetValue("turretGroupTag"); } }
         public string azimuthTag { get { return (string)nameSerializer.GetValue("azimuthTag"); } }
         public string elevationTag { get { return (string)nameSerializer.GetValue("elevationTag"); } }
+        public string controllerName { get { return (string)nameSerializer.GetValue("controllerName"); } }
+
 
         #endregion
 
@@ -47,9 +49,25 @@ namespace IngameScript
             ingameTime = new IngameTime();
             turretGroups = new List<TurretGroup>();
 
+            #region serializer
+            nameSerializer = new INISerializer("[NameConfig]");
+
             nameSerializer.AddValue("turretGroupTag", x => x, "[HaE Turret]");
             nameSerializer.AddValue("azimuthTag", x => x, "[Azimuth]");
             nameSerializer.AddValue("elevationTag", x => x, "[Elevation]");
+            nameSerializer.AddValue("controllerName", x => x, "Controller");
+
+            if (Me.CustomData == "")
+            {
+                string temp = Me.CustomData;
+                nameSerializer.FirstSerialization(ref temp);
+                Me.CustomData = temp;
+            }
+            else
+            {
+                nameSerializer.DeSerialize(Me.CustomData);
+            }
+            #endregion
 
             List<IMyBlockGroup> groups = new List<IMyBlockGroup>();
             GridTerminalSystem.GetBlockGroups(groups, x => x.Name.Contains(turretGroupTag));
