@@ -25,8 +25,8 @@ namespace IngameScript
             public bool restMode = false;
 
             Vector3D currentTargetDir;
-            int salvoSize = 3;
-            double salvoTimeout = 2.5;
+            public int salvoSize = 3;
+            public double salvoTimeout = 2.5;
             
             RotorControl rotorControl;
             List<RotorLauncher> launchers = new List<RotorLauncher>();
