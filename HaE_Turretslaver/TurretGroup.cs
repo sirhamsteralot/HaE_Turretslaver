@@ -25,12 +25,18 @@ namespace IngameScript
             public bool restMode = false;
 
             Vector3D currentTargetDir;
-            public int salvoSize = 3;
-            public double salvoTimeout = 2.5;
+
+            INISerializer turretConfig;
+            public double azimuthMultiplier { get { return (double)turretConfig.GetValue("azimuthMultiplier"); } }
+            public double elevationMultiplier { get { return (double)turretConfig.GetValue("elevationMultiplier"); } }
+            public int salvoSize { get { return (int)turretConfig.GetValue("salvoSize"); } }
+            public double salvoTimeout { get { return (double)turretConfig.GetValue("salvoTimeout"); } }
             
             RotorControl rotorControl;
             List<RotorLauncher> launchers = new List<RotorLauncher>();
             IngameTime ingameTime;
+
+            
 
             public TurretGroup(List<IMyMotorStator> rotors, IngameTime ingameTime, string azimuthTag, string elevationTag)
             {
@@ -66,6 +72,26 @@ namespace IngameScript
                 rotorControl = new RotorControl(azimuthPair, elevationPairs);
                 rotorControl.onTarget = OnTarget;
 
+                #region configuration
+                turretConfig = new INISerializer("TurretConfig");
+
+                turretConfig.AddValue("azimuthMultiplier", x => double.Parse(x), -1.0);
+                turretConfig.AddValue("elevationMultiplier", x => double.Parse(x), -1.0);
+                turretConfig.AddValue("salvoSize", x => int.Parse(x), 3);
+                turretConfig.AddValue("salvoTimeout", x => double.Parse(x), 2.5);
+
+                if (rotorControl.azimuth.rotor.CustomData == "")
+                {
+                    string temp = rotorControl.azimuth.rotor.CustomData;
+                    turretConfig.FirstSerialization(ref temp);
+                    rotorControl.azimuth.rotor.CustomData = temp;
+                }
+                else
+                {
+                    turretConfig.DeSerialize(rotorControl.azimuth.rotor.CustomData);
+                }
+                #endregion
+
                 foreach (var cannonbase in cannonBases)
                 {
                     var launcher = new RotorLauncher(cannonbase, ingameTime, salvoTimeout);
@@ -83,11 +109,11 @@ namespace IngameScript
 
                 if (currentTargetDir == Vector3D.Zero)
                 {
-                    rotorControl.AimAtTarget(defaultDir);
+                    rotorControl.AimAtTarget(defaultDir, azimuthMultiplier, elevationMultiplier);
                     return;
                 }
 
-                rotorControl.AimAtTarget(currentTargetDir);
+                rotorControl.AimAtTarget(currentTargetDir, azimuthMultiplier, elevationMultiplier);
             }
 
             public void TargetDirection(Vector3D targetDirection)

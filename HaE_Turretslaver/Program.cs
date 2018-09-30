@@ -70,7 +70,6 @@ namespace IngameScript
             #endregion
             
             control = GridTerminalSystem.GetBlockWithName(controllerName) as IMyShipController;
-            Echo($"controllerName: |{controllerName}|\ncontrol: {control != null}\n\n");
 
             targetTracker = new EntityTracking_Module(GTSUtils, control, null);
             targetTracker.onEntityDetected += OnEntityDetected;
