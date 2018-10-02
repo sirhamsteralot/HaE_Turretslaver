@@ -28,7 +28,7 @@ namespace IngameScript
         public string azimuthTag { get { return (string)nameSerializer.GetValue("azimuthTag"); } }
         public string elevationTag { get { return (string)nameSerializer.GetValue("elevationTag"); } }
         public string controllerName { get { return (string)nameSerializer.GetValue("controllerName"); } }
-
+        public string groupType { get { return (string)nameSerializer.GetValue("groupType"); } }
 
         #endregion
 
@@ -40,22 +40,26 @@ namespace IngameScript
         IngameTime ingameTime;
         GridTerminalSystemUtils GTSUtils;
 
+        Scheduler mainScheduler;
+
         IMyShipController control;
 
 
         public Program() {
 
             GTSUtils = new GridTerminalSystemUtils(Me, GridTerminalSystem);
+            mainScheduler = new Scheduler();
             ingameTime = new IngameTime();
             turretGroups = new List<TurretGroup>();
 
             #region serializer
-            nameSerializer = new INISerializer("NameConfig");
+            nameSerializer = new INISerializer("Config");
 
             nameSerializer.AddValue("turretGroupTag", x => x, "[HaE Turret]");
             nameSerializer.AddValue("azimuthTag", x => x, "[Azimuth]");
             nameSerializer.AddValue("elevationTag", x => x, "[Elevation]");
             nameSerializer.AddValue("controllerName", x => x, "Controller");
+            nameSerializer.AddValue("groupType", x => x, "BlockGroup");
 
             if (Me.CustomData == "")
             {
@@ -68,7 +72,15 @@ namespace IngameScript
                 nameSerializer.DeSerialize(Me.CustomData);
             }
             #endregion
-            
+
+            mainScheduler.AddTask(Init());
+
+            Runtime.UpdateFrequency = UpdateFrequency.Update1 | UpdateFrequency.Update10;
+        }
+
+        public bool initialized = false;
+        public IEnumerator<bool> Init()
+        {
             control = GridTerminalSystem.GetBlockWithName(controllerName) as IMyShipController;
 
             targetTracker = new EntityTracking_Module(GTSUtils, control, null);
@@ -79,15 +91,31 @@ namespace IngameScript
             gridCannonTargeting.onRoutineFail += OnTargetingFail;
             gridCannonTargeting.onTargetTimeout += OnTargetTimeout;
 
-            List<IMyBlockGroup> groups = new List<IMyBlockGroup>();
-            GridTerminalSystem.GetBlockGroups(groups, x => x.Name.Contains(turretGroupTag));
-            foreach(var group in groups)
+            switch (groupType)
             {
-                AddTurret(group);
+                case "BlockGroup":
+                    List<IMyBlockGroup> groups = new List<IMyBlockGroup>();
+                    GridTerminalSystem.GetBlockGroups(groups, x => x.Name.Contains(turretGroupTag));
+                    foreach (var group in groups)
+                    {
+                        AddTurret(group);
+                        yield return true;
+                    }
+                    break;
+
+                case "NameTag":
+                    List<IMyMotorStator> rotors = new List<IMyMotorStator>();
+                    GridTerminalSystem.GetBlocksOfType(rotors, x => x.Name.Contains(turretGroupTag));
+                    foreach (var stator in rotors)
+                    {
+                        AddTurret(stator);
+                        yield return true;
+                    }
+                    break;
             }
 
 
-            Runtime.UpdateFrequency = UpdateFrequency.Update1 | UpdateFrequency.Update10;
+            initialized = true;
         }
 
 
@@ -97,6 +125,11 @@ namespace IngameScript
         double averageTurretGroupInstructionCount;
         public void Main(string argument, UpdateType updateSource)
         {
+            mainScheduler.Main();
+
+            if (!initialized)
+                return;
+
             if (DEBUG)
             {
                 int tempCount = Runtime.CurrentInstructionCount;
@@ -140,6 +173,41 @@ namespace IngameScript
         public void AddTurret(IMyBlockGroup group)
         {
             var turretGroup = new TurretGroup(group, ingameTime, azimuthTag, elevationTag);
+            turretGroup.TargetDirection(Vector3D.Zero);
+            turretGroup.defaultDir = control.WorldMatrix.Forward;
+
+            turretGroups.Add(turretGroup);
+        }
+
+        List<IMyMotorStator> rotors = new List<IMyMotorStator>();
+        List<IMyMotorStator> cache = new List<IMyMotorStator>();
+        List<IMyMotorStator> prevTop = new List<IMyMotorStator>();
+        List<IMyMotorStator> currentTop = new List<IMyMotorStator>();
+        public void AddTurret(IMyMotorStator sourceRotor)
+        {
+            rotors.Clear();
+            cache.Clear();
+            prevTop.Clear();
+            currentTop.Clear();
+
+            rotors.Add(sourceRotor);
+            prevTop.AddRange(rotors);
+
+            while (prevTop.Count > 0)
+            {
+                foreach (var rotor in prevTop)
+                {
+                    rotor.TopGrid.GetCubesOfType(GridTerminalSystem, cache);
+                    currentTop.AddRange(cache);
+                }
+
+                rotors.AddRange(currentTop);
+
+                prevTop.Clear();
+                prevTop.AddRange(currentTop);
+            }
+
+            var turretGroup = new TurretGroup(rotors, ingameTime, azimuthTag, elevationTag);
             turretGroup.TargetDirection(Vector3D.Zero);
             turretGroup.defaultDir = control.WorldMatrix.Forward;
 
