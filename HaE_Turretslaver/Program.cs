@@ -105,7 +105,7 @@ namespace IngameScript
 
                 case "NameTag":
                     List<IMyMotorStator> rotors = new List<IMyMotorStator>();
-                    GridTerminalSystem.GetBlocksOfType(rotors, x => x.Name.Contains(turretGroupTag));
+                    GridTerminalSystem.GetBlocksOfType(rotors, x => x.CustomName.Contains(turretGroupTag));
                     foreach (var stator in rotors)
                     {
                         AddTurret(stator);
