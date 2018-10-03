@@ -90,10 +90,10 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="MDKUtilities">
-      <HintPath>c:\users\sirha\appdata\local\microsoft\visualstudio\15.0_d85c6838\extensions\kxzq4gdw.ci5\MDKUtilities.dll</HintPath>
+      <HintPath>c:\users\sirha\appdata\local\microsoft\visualstudio\15.0_26aa628f\extensions\egk0awdx.dcc\MDKUtilities.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Analyzer Include="c:\users\sirha\appdata\local\microsoft\visualstudio\15.0_d85c6838\extensions\kxzq4gdw.ci5\Analyzers\MDKAnalyzer.dll" />
+    <Analyzer Include="c:\users\sirha\appdata\local\microsoft\visualstudio\15.0_26aa628f\extensions\egk0awdx.dcc\Analyzers\MDKAnalyzer.dll" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MDK\Bootstrapper.cs" />
@@ -107,15 +107,15 @@
     <Compile Include="RotorControl.cs" />
     <Compile Include="TurretGroup.cs" />
   </ItemGroup>
-  <Import Project="..\..\..\..\MDK_Projects\Shared Projects\EntityTrackingModule\EntityTrackingModule.projitems" Label="Shared" />
-  <Import Project="..\..\..\..\MDK_Projects\Shared Projects\HaE GridTerminalSystemUtils\HaE GridTerminalSystemUtils.projitems" Label="Shared" />
-  <Import Project="..\..\..\..\MDK_Projects\Shared Projects\HaE Targeting\HaE Targeting.projitems" Label="Shared" />
-  <Import Project="..\..\..\..\MDK_Projects\Shared Projects\HaE WeaponUtils\HaE WeaponUtils.projitems" Label="Shared" />
-  <Import Project="..\..\..\..\MDK_Projects\Shared Projects\HaE RotorUtils\HaE RotorUtils.projitems" Label="Shared" />
-  <Import Project="..\..\..\..\MDK_Projects\Shared Projects\HaE Scheduler\HaE Scheduler.projitems" Label="Shared" />
-  <Import Project="..\..\..\..\MDK_Projects\Shared Projects\VectorUtils\VectorUtils.projitems" Label="Shared" />
-  <Import Project="..\..\..\..\MDK_Projects\Shared Projects\HaE Timing\HaE Timing.projitems" Label="Shared" />
-  <Import Project="..\..\..\..\MDK_Projects\Shared Projects\HaE Serialization\HaE Serialization.projitems" Label="Shared" />
+  <Import Project="C:\Users\SirHa\source\repos\sirhamsteralot\HaE-Shared-Projects\EntityTrackingModule\EntityTrackingModule.projitems" Label="Shared" />
+  <Import Project="C:\Users\SirHa\source\repos\sirhamsteralot\HaE-Shared-Projects\HaE WeaponUtils\HaE WeaponUtils.projitems" Label="Shared" />
+  <Import Project="C:\Users\SirHa\source\repos\sirhamsteralot\HaE-Shared-Projects\HaE Timing\HaE Timing.projitems" Label="Shared" />
+  <Import Project="C:\Users\SirHa\source\repos\sirhamsteralot\HaE-Shared-Projects\HaE Targeting\HaE Targeting.projitems" Label="Shared" />
+  <Import Project="C:\Users\SirHa\source\repos\sirhamsteralot\HaE-Shared-Projects\HaE RotorUtils\HaE RotorUtils.projitems" Label="Shared" />
+  <Import Project="C:\Users\SirHa\source\repos\sirhamsteralot\HaE-Shared-Projects\HaE Scheduler\HaE Scheduler.projitems" Label="Shared" />
+  <Import Project="C:\Users\SirHa\source\repos\sirhamsteralot\HaE-Shared-Projects\VectorUtils\VectorUtils.projitems" Label="Shared" />
+  <Import Project="C:\Users\SirHa\source\repos\sirhamsteralot\HaE-Shared-Projects\HaE GridTerminalSystemUtils\HaE GridTerminalSystemUtils.projitems" Label="Shared" />
+  <Import Project="C:\Users\SirHa\source\repos\sirhamsteralot\HaE-Shared-Projects\HaE Serialization\HaE Serialization.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="AfterBuild">
     <Copy SourceFiles="mdk\mdk.options" DestinationFolder="$(TargetDir)\mdk" />

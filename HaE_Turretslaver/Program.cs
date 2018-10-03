@@ -197,7 +197,7 @@ namespace IngameScript
             {
                 foreach (var rotor in prevTop)
                 {
-                    rotor.TopGrid.GetCubesOfType(GridTerminalSystem, cache);
+                    rotor.TopGrid?.GetCubesOfType(GridTerminalSystem, cache);
                     currentTop.AddRange(cache);
                 }
 
@@ -205,6 +205,7 @@ namespace IngameScript
 
                 prevTop.Clear();
                 prevTop.AddRange(currentTop);
+                currentTop.Clear();
             }
 
             var turretGroup = new TurretGroup(rotors, ingameTime, azimuthTag, elevationTag);
