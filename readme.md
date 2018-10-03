@@ -6,5 +6,6 @@
 - HaE WeaponUtils
 - HaE RotorUtils
 - HaE Scheduler
+- HaE Serialization
 - HaE MathUtils
 - HaE Timing
