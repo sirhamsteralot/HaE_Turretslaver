@@ -197,6 +197,7 @@ namespace IngameScript
             {
                 foreach (var rotor in prevTop)
                 {
+                    cache.Clear();
                     rotor.TopGrid?.GetCubesOfType(GridTerminalSystem, cache);
                     currentTop.AddRange(cache);
                 }
