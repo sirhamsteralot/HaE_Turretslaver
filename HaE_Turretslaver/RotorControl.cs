@@ -36,12 +36,12 @@ namespace IngameScript
             public void AimAtTarget(Vector3D desiredDirection, double azimuthMultiplier = -1, double elevationMultiplier = -1)
             {
                 Vector3D refDirAz = azimuth.reference.WorldMatrix.Up;
-                RotorUtils.PointRotorAtVector(azimuth.rotor, azimuthMultiplier * desiredDirection, refDirAz);
+                RotorUtils.PointRotorAtVector(azimuth.rotor, azimuthMultiplier * desiredDirection, refDirAz, 2);
 
                 foreach (var elevation in elevationRotors)
                 {
                     var refDirEl = elevation.reference.WorldMatrix.Up;
-                    RotorUtils.PointRotorAtVector(elevation.rotor, elevationMultiplier * desiredDirection, refDirEl);
+                    RotorUtils.PointRotorAtVector(elevation.rotor, elevationMultiplier * desiredDirection, refDirEl, 2);
 
                     CheckSetTarget(desiredDirection, refDirEl, elevation.rotor);
                 }
