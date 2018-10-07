@@ -60,6 +60,7 @@ namespace IngameScript
             nameSerializer.AddValue("elevationTag", x => x, "[Elevation]");
             nameSerializer.AddValue("controllerName", x => x, "Controller");
             nameSerializer.AddValue("groupType", x => x, "BlockGroup");
+            nameSerializer.AddValue("maxProjectileVel", x => double.Parse(x), 100);
 
             if (Me.CustomData == "")
             {
@@ -82,6 +83,12 @@ namespace IngameScript
         public IEnumerator<bool> Init()
         {
             control = GridTerminalSystem.GetBlockWithName(controllerName) as IMyShipController;
+            if (control == null)
+            {
+                Echo($"no shipcontroller found with name {controllerName}!");
+                yield return false;
+            }
+                
 
             targetTracker = new EntityTracking_Module(GTSUtils, control, null);
             targetTracker.onEntityDetected += OnEntityDetected;

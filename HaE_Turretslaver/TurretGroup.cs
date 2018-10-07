@@ -36,7 +36,6 @@ namespace IngameScript
             List<RotorLauncher> launchers = new List<RotorLauncher>();
             IngameTime ingameTime;
 
-            
 
             public TurretGroup(List<IMyMotorStator> rotors, IngameTime ingameTime, string azimuthTag, string elevationTag)
             {
