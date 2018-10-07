@@ -61,7 +61,7 @@ namespace IngameScript
             nameSerializer.AddValue("elevationTag", x => x, "[Elevation]");
             nameSerializer.AddValue("controllerName", x => x, "Controller");
             nameSerializer.AddValue("groupType", x => x, "BlockGroup");
-            nameSerializer.AddValue("maxProjectileVel", x => double.Parse(x), maxProjectileVel);
+            nameSerializer.AddValue("maxProjectileVel", x => double.Parse(x), 100);
 
             if (Me.CustomData == "")
             {
