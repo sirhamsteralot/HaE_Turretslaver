@@ -60,7 +60,7 @@ namespace IngameScript
             nameSerializer.AddValue("azimuthTag", x => x, "[Azimuth]");
             nameSerializer.AddValue("elevationTag", x => x, "[Elevation]");
             nameSerializer.AddValue("controllerName", x => x, "Controller");
-            nameSerializer.AddValue("groupType", x => x, "NameTag");
+            nameSerializer.AddValue("groupType", x => x, "Any");
             nameSerializer.AddValue("maxProjectileVel", x => double.Parse(x), 100);
 
             if (Me.CustomData == "")
@@ -115,6 +115,24 @@ namespace IngameScript
                     List<IMyMotorStator> rotors = new List<IMyMotorStator>();
                     GridTerminalSystem.GetBlocksOfType(rotors, x => x.CustomName.Contains(turretGroupTag));
                     foreach (var stator in rotors)
+                    {
+                        AddTurret(stator);
+                        yield return true;
+                    }
+                    break;
+
+                case "Any":
+                    List<IMyBlockGroup> groupsA = new List<IMyBlockGroup>();
+                    GridTerminalSystem.GetBlockGroups(groupsA, x => x.Name.Contains(turretGroupTag));
+                    foreach (var group in groupsA)
+                    {
+                        AddTurret(group);
+                        yield return true;
+                    }
+
+                    List<IMyMotorStator> rotorsA = new List<IMyMotorStator>();
+                    GridTerminalSystem.GetBlocksOfType(rotorsA, x => x.CustomName.Contains(turretGroupTag));
+                    foreach (var stator in rotorsA)
                     {
                         AddTurret(stator);
                         yield return true;
