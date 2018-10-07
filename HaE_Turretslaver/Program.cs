@@ -60,7 +60,7 @@ namespace IngameScript
             nameSerializer.AddValue("azimuthTag", x => x, "[Azimuth]");
             nameSerializer.AddValue("elevationTag", x => x, "[Elevation]");
             nameSerializer.AddValue("controllerName", x => x, "Controller");
-            nameSerializer.AddValue("groupType", x => x, "BlockGroup");
+            nameSerializer.AddValue("groupType", x => x, "NameTag");
             nameSerializer.AddValue("maxProjectileVel", x => double.Parse(x), 100);
 
             if (Me.CustomData == "")
@@ -94,7 +94,7 @@ namespace IngameScript
             targetTracker = new EntityTracking_Module(GTSUtils, control, null);
             targetTracker.onEntityDetected += OnEntityDetected;
 
-            gridCannonTargeting = new GridCannonTargeting(control, ingameTime, 100);
+            gridCannonTargeting = new GridCannonTargeting(control, ingameTime, maxProjectileVel);
             gridCannonTargeting.onRoutineFinish += OnTargetSolved;
             gridCannonTargeting.onRoutineFail += OnTargetingFail;
             gridCannonTargeting.onTargetTimeout += OnTargetTimeout;
