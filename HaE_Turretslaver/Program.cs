@@ -29,6 +29,7 @@ namespace IngameScript
         public string elevationTag { get { return (string)nameSerializer.GetValue("elevationTag"); } }
         public string controllerName { get { return (string)nameSerializer.GetValue("controllerName"); } }
         public string groupType { get { return (string)nameSerializer.GetValue("groupType"); } }
+        public double maxProjectileVel { get { return (double)nameSerializer.GetValue("maxProjectileVel"); } }
 
         #endregion
 
@@ -60,7 +61,7 @@ namespace IngameScript
             nameSerializer.AddValue("elevationTag", x => x, "[Elevation]");
             nameSerializer.AddValue("controllerName", x => x, "Controller");
             nameSerializer.AddValue("groupType", x => x, "BlockGroup");
-            nameSerializer.AddValue("maxProjectileVel", x => double.Parse(x), 100);
+            nameSerializer.AddValue("maxProjectileVel", x => double.Parse(x), maxProjectileVel);
 
             if (Me.CustomData == "")
             {
