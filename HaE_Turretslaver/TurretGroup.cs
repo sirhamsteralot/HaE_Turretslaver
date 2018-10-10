@@ -105,7 +105,7 @@ namespace IngameScript
                     return;
 
                 if (inactive)
-                    rotorControl.Lock(true);
+                    return;
 
                 foreach (var gun in launchers)
                     gun.Tick();
@@ -119,6 +119,18 @@ namespace IngameScript
                 rotorControl.AimAtTarget(currentTargetDir, azimuthMultiplier, elevationMultiplier);
             }
 
+            public void DisableTurret(bool value)
+            {
+                inactive = value;
+                rotorControl.azimuth.rotor.TargetVelocityRad = 0;
+                foreach (var rotor in rotorControl.elevationRotors)
+                {
+                    rotor.rotor.TargetVelocityRad = 0;
+                }
+
+                rotorControl.Lock(value);
+            }
+
             public TurretGroupStatus CheckGroupStatus()
             {
                 var damageAmount = TurretGroupStatus.Active;
@@ -126,7 +138,7 @@ namespace IngameScript
                 if (rotorControl.azimuth.rotor.IsClosed())
                     return TurretGroupStatus.MajorDMG;
                 if (rotorControl.azimuth.reference.IsClosed())
-                    damageAmount = TurretGroupStatus.MinorDMG;
+                    return TurretGroupStatus.MajorDMG;
 
                 foreach (var elevationRot in rotorControl.elevationRotors)
                 {

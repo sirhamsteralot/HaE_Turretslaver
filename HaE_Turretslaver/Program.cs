@@ -228,6 +228,7 @@ namespace IngameScript
                         break;
                     case TurretGroup.TurretGroupStatus.MajorDMG:
                         major++;
+                        cannon.DisableTurret(true);
                         break;
                 }
             }
