@@ -23,6 +23,7 @@ namespace IngameScript
         {
             public Vector3D defaultDir;
             public bool restMode = false;
+            public bool inactive = false;
 
             Vector3D currentTargetDir;
 
@@ -103,6 +104,9 @@ namespace IngameScript
                 if (restMode)
                     return;
 
+                if (inactive)
+                    rotorControl.Lock(true);
+
                 foreach (var gun in launchers)
                     gun.Tick();
 
@@ -113,6 +117,27 @@ namespace IngameScript
                 }
 
                 rotorControl.AimAtTarget(currentTargetDir, azimuthMultiplier, elevationMultiplier);
+            }
+
+            public TurretGroupStatus CheckGroupStatus()
+            {
+                var damageAmount = TurretGroupStatus.Active;
+
+                if (rotorControl.azimuth.rotor.IsClosed())
+                    return TurretGroupStatus.MajorDMG;
+                if (rotorControl.azimuth.reference.IsClosed())
+                    damageAmount = TurretGroupStatus.MinorDMG;
+
+                foreach (var elevationRot in rotorControl.elevationRotors)
+                {
+                    if (elevationRot.rotor.IsClosed())
+                        return TurretGroupStatus.MajorDMG;
+
+                    if (elevationRot.reference.IsClosed())
+                        damageAmount = TurretGroupStatus.MinorDMG;
+                }
+
+                return damageAmount;
             }
 
             public void TargetDirection(Vector3D targetDirection)
@@ -171,6 +196,13 @@ namespace IngameScript
                         elevation.RemoveAt(i);
                 }
                 return tmplist;
+            }
+
+            public enum TurretGroupStatus
+            {
+                Active,
+                MinorDMG,
+                MajorDMG,
             }
         }
     }

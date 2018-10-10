@@ -19,7 +19,7 @@ namespace IngameScript
 {
     partial class Program : MyGridProgram
     {
-        public const bool DEBUG = true;
+        public const bool DEBUG = false;
 
         #region iniSerializer
         INISerializer nameSerializer;
@@ -29,14 +29,15 @@ namespace IngameScript
         public string elevationTag { get { return (string)nameSerializer.GetValue("elevationTag"); } }
         public string controllerName { get { return (string)nameSerializer.GetValue("controllerName"); } }
         public string groupType { get { return (string)nameSerializer.GetValue("groupType"); } }
+        public string lcdStatusTag { get { return (string)nameSerializer.GetValue("lcdStatusTag"); } }
         public double maxProjectileVel { get { return (double)nameSerializer.GetValue("maxProjectileVel"); } }
-
         #endregion
 
 
         List<TurretGroup> turretGroups;
         EntityTracking_Module targetTracker;
         GridCannonTargeting gridCannonTargeting;
+        StatusWriter statusWriter;
 
         IngameTime ingameTime;
         GridTerminalSystemUtils GTSUtils;
@@ -61,6 +62,7 @@ namespace IngameScript
             nameSerializer.AddValue("elevationTag", x => x, "[Elevation]");
             nameSerializer.AddValue("controllerName", x => x, "Controller");
             nameSerializer.AddValue("groupType", x => x, "Any");
+            nameSerializer.AddValue("lcdStatusTag", x => x, "[GridcannonStatus]");
             nameSerializer.AddValue("maxProjectileVel", x => double.Parse(x), 100);
 
             if (Me.CustomData == "")
@@ -77,7 +79,7 @@ namespace IngameScript
 
             mainScheduler.AddTask(Init());
 
-            Runtime.UpdateFrequency = UpdateFrequency.Update1 | UpdateFrequency.Update10;
+            Runtime.UpdateFrequency = UpdateFrequency.Update1 | UpdateFrequency.Update10 | UpdateFrequency.Update100;
         }
 
         public bool initialized = false;
@@ -89,7 +91,11 @@ namespace IngameScript
                 Echo($"no shipcontroller found with name {controllerName}!");
                 yield return false;
             }
-                
+
+            List<IMyTextPanel> lcds = new List<IMyTextPanel>();
+            GridTerminalSystem.GetBlocksOfType(lcds, x => x.CustomName.Contains(lcdStatusTag));
+            statusWriter = new StatusWriter(lcds);
+
 
             targetTracker = new EntityTracking_Module(GTSUtils, control, null);
             targetTracker.onEntityDetected += OnEntityDetected;
@@ -140,7 +146,7 @@ namespace IngameScript
                     break;
             }
 
-
+            statusWriter.UpdateCannonCount(turretGroups.Count, 0, 0);
             initialized = true;
         }
 
@@ -156,6 +162,9 @@ namespace IngameScript
             if (!initialized)
                 return;
 
+            statusWriter.Main();
+
+            #pragma warning disable CS0162
             if (DEBUG)
             {
                 int tempCount = Runtime.CurrentInstructionCount;
@@ -185,9 +194,12 @@ namespace IngameScript
                 return;
             }
 
-            #pragma warning disable
+            
             if ((updateSource & UpdateType.Update10) != 0)
                 targetTracker.Poll();
+            if ((updateSource & UpdateType.Update100) != 0)
+                CheckTurrets();
+
 
             gridCannonTargeting.Tick();
             TickTurrets();
@@ -196,13 +208,41 @@ namespace IngameScript
             #pragma warning restore
         }
 
+        public void CheckTurrets()
+        {
+            int normal = 0;
+            int minor = 0;
+            int major = 0;
+
+            foreach (var cannon in turretGroups)
+            {
+                TurretGroup.TurretGroupStatus status = cannon.CheckGroupStatus();
+
+                switch(status)
+                {
+                    case TurretGroup.TurretGroupStatus.Active:
+                        normal++;
+                        break;
+                    case TurretGroup.TurretGroupStatus.MinorDMG:
+                        minor++;
+                        break;
+                    case TurretGroup.TurretGroupStatus.MajorDMG:
+                        major++;
+                        break;
+                }
+            }
+
+            statusWriter.UpdateCannonCount(normal, minor, major);
+        }
+
         public void AddTurret(IMyBlockGroup group)
         {
             var turretGroup = new TurretGroup(group, ingameTime, azimuthTag, elevationTag);
             turretGroup.TargetDirection(Vector3D.Zero);
             turretGroup.defaultDir = control.WorldMatrix.Forward;
 
-            turretGroups.Add(turretGroup);
+            if (turretGroup.CheckGroupStatus() != TurretGroup.TurretGroupStatus.MajorDMG)
+                turretGroups.Add(turretGroup);
         }
 
         List<IMyMotorStator> rotors = new List<IMyMotorStator>();
@@ -239,7 +279,8 @@ namespace IngameScript
             turretGroup.TargetDirection(Vector3D.Zero);
             turretGroup.defaultDir = control.WorldMatrix.Forward;
 
-            turretGroups.Add(turretGroup);
+            if (turretGroup.CheckGroupStatus() != TurretGroup.TurretGroupStatus.MajorDMG)
+                turretGroups.Add(turretGroup);
         }
 
         public void TickTurrets()
@@ -251,6 +292,7 @@ namespace IngameScript
         public void OnEntityDetected(HaE_Entity entity)
         {
             gridCannonTargeting.NewTarget(entity.entityInfo);
+            statusWriter.UpdateStatus(StatusWriter.TargetingStatus.Targeting);
         }
 
         public void OnTargetSolved(Vector3D targetPos)
@@ -259,6 +301,8 @@ namespace IngameScript
             {
                 turretGroup.TargetPosition(targetPos);
             }
+
+            statusWriter.UpdateStatus(StatusWriter.TargetingStatus.Ontarget);
         }
 
         public void OnTargetingFail()
@@ -274,6 +318,8 @@ namespace IngameScript
                     turretGroup.defaultDir = currentSimDir;
                 }
             }
+
+            statusWriter.UpdateStatus(StatusWriter.TargetingStatus.Targeting);
         }
 
         public void OnTargetTimeout()
@@ -283,6 +329,8 @@ namespace IngameScript
                 turretGroup.TargetDirection(Vector3D.Zero);
                 turretGroup.defaultDir = control.WorldMatrix.Forward;
             }
+
+            statusWriter.UpdateStatus(StatusWriter.TargetingStatus.Idle);
         }
     }
 }
