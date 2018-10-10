@@ -106,6 +106,7 @@
     <AdditionalFiles Include="MDK\whitelist.cache" />
     <Compile Include="RotorControl.cs" />
     <Compile Include="TurretGroup.cs" />
+    <Compile Include="StatusWriter.cs" />
   </ItemGroup>
   <Import Project="..\..\..\..\MDK_Projects\Shared Projects\EntityTrackingModule\EntityTrackingModule.projitems" Label="Shared" />
   <Import Project="..\..\..\..\MDK_Projects\Shared Projects\HaE GridTerminalSystemUtils\HaE GridTerminalSystemUtils.projitems" Label="Shared" />
