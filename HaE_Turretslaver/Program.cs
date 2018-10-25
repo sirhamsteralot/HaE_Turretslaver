@@ -34,7 +34,7 @@ namespace IngameScript
         #endregion
 
 
-        List<TurretGroup> turretGroups;
+        List<RotorTurretGroup> turretGroups;
         EntityTracking_Module targetTracker;
         GridCannonTargeting gridCannonTargeting;
         StatusWriter statusWriter;
@@ -52,7 +52,7 @@ namespace IngameScript
             GTSUtils = new GridTerminalSystemUtils(Me, GridTerminalSystem);
             mainScheduler = new Scheduler();
             ingameTime = new IngameTime();
-            turretGroups = new List<TurretGroup>();
+            turretGroups = new List<RotorTurretGroup>();
 
             #region serializer
             nameSerializer = new INISerializer("Config");
@@ -216,17 +216,17 @@ namespace IngameScript
 
             foreach (var cannon in turretGroups)
             {
-                TurretGroup.TurretGroupStatus status = cannon.CheckGroupStatus();
+                TurretGroupUtils.TurretGroupStatus status = cannon.CheckGroupStatus();
 
                 switch(status)
                 {
-                    case TurretGroup.TurretGroupStatus.Active:
+                    case TurretGroupUtils.TurretGroupStatus.Active:
                         normal++;
                         break;
-                    case TurretGroup.TurretGroupStatus.MinorDMG:
+                    case TurretGroupUtils.TurretGroupStatus.MinorDMG:
                         minor++;
                         break;
-                    case TurretGroup.TurretGroupStatus.MajorDMG:
+                    case TurretGroupUtils.TurretGroupStatus.MajorDMG:
                         major++;
                         cannon.DisableTurret(true);
                         break;
@@ -238,11 +238,11 @@ namespace IngameScript
 
         public void AddTurret(IMyBlockGroup group)
         {
-            var turretGroup = new TurretGroup(group, ingameTime, azimuthTag, elevationTag);
+            var turretGroup = new RotorTurretGroup(group, ingameTime, azimuthTag, elevationTag);
             turretGroup.TargetDirection(Vector3D.Zero);
             turretGroup.defaultDir = control.WorldMatrix.Forward;
 
-            if (turretGroup.CheckGroupStatus() != TurretGroup.TurretGroupStatus.MajorDMG)
+            if (turretGroup.CheckGroupStatus() != TurretGroupUtils.TurretGroupStatus.MajorDMG)
                 turretGroups.Add(turretGroup);
         }
 
@@ -276,17 +276,17 @@ namespace IngameScript
                 currentTop.Clear();
             }
 
-            var turretGroup = new TurretGroup(rotors, ingameTime, azimuthTag, elevationTag);
+            var turretGroup = new RotorTurretGroup(rotors, ingameTime, azimuthTag, elevationTag);
             turretGroup.TargetDirection(Vector3D.Zero);
             turretGroup.defaultDir = control.WorldMatrix.Forward;
 
-            if (turretGroup.CheckGroupStatus() != TurretGroup.TurretGroupStatus.MajorDMG)
+            if (turretGroup.CheckGroupStatus() != TurretGroupUtils.TurretGroupStatus.MajorDMG)
                 turretGroups.Add(turretGroup);
         }
 
         public void TickTurrets()
         {
-            foreach (TurretGroup turret in turretGroups)
+            foreach (RotorTurretGroup turret in turretGroups)
                 turret.Tick();
         }
 
@@ -298,7 +298,7 @@ namespace IngameScript
 
         public void OnTargetSolved(Vector3D targetPos)
         {
-            foreach (TurretGroup turretGroup in turretGroups)
+            foreach (RotorTurretGroup turretGroup in turretGroups)
             {
                 turretGroup.TargetPosition(targetPos);
             }
@@ -308,7 +308,7 @@ namespace IngameScript
 
         public void OnTargetingFail()
         {
-            foreach (TurretGroup turretGroup in turretGroups)
+            foreach (RotorTurretGroup turretGroup in turretGroups)
             {
                 turretGroup.TargetDirection(Vector3D.Zero);
 
@@ -325,7 +325,7 @@ namespace IngameScript
 
         public void OnTargetTimeout()
         {
-            foreach (TurretGroup turretGroup in turretGroups)
+            foreach (RotorTurretGroup turretGroup in turretGroups)
             {
                 turretGroup.TargetDirection(Vector3D.Zero);
                 turretGroup.defaultDir = control.WorldMatrix.Forward;

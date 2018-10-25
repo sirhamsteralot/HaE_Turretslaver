@@ -19,7 +19,7 @@ namespace IngameScript
 {
     partial class Program
     {
-        public class TurretGroup
+        public class GatlingTurretGroup : ITurretGroup
         {
             public Vector3D defaultDir;
             public bool restMode = false;
@@ -32,23 +32,23 @@ namespace IngameScript
             public double elevationMultiplier { get { return (double)turretConfig.GetValue("elevationMultiplier"); } }
             public int salvoSize { get { return (int)turretConfig.GetValue("salvoSize"); } }
             public double salvoTimeout { get { return (double)turretConfig.GetValue("salvoTimeout"); } }
-            
+
             RotorControl rotorControl;
             List<RotorLauncher> launchers = new List<RotorLauncher>();
             IngameTime ingameTime;
 
 
-            public TurretGroup(List<IMyMotorStator> rotors, IngameTime ingameTime, string azimuthTag, string elevationTag)
+            public GatlingTurretGroup(List<IMyMotorStator> rotors, IngameTime ingameTime, string azimuthTag, string elevationTag)
             {
                 Setup(rotors, ingameTime, azimuthTag, elevationTag);
             }
 
-            public TurretGroup(IMyBlockGroup turretGroup, IngameTime ingameTime, string azimuthTag, string elevationTag)
+            public GatlingTurretGroup(IMyBlockGroup turretGroup, IngameTime ingameTime, string azimuthTag, string elevationTag)
             {
                 var rotors = new List<IMyMotorStator>();
                 turretGroup.GetBlocksOfType(rotors);
 
-                Setup (rotors, ingameTime, azimuthTag, elevationTag);
+                Setup(rotors, ingameTime, azimuthTag, elevationTag);
             }
 
             public void Setup(List<IMyMotorStator> rotors, IngameTime ingameTime, string azimuthTag, string elevationTag)
@@ -131,22 +131,22 @@ namespace IngameScript
                 rotorControl.Lock(value);
             }
 
-            public TurretGroupStatus CheckGroupStatus()
+            public TurretGroupUtils.TurretGroupStatus CheckGroupStatus()
             {
-                var damageAmount = TurretGroupStatus.Active;
+                var damageAmount = TurretGroupUtils.TurretGroupStatus.Active;
 
                 if (rotorControl.azimuth.rotor.IsClosed())
-                    return TurretGroupStatus.MajorDMG;
+                    return TurretGroupUtils.TurretGroupStatus.MajorDMG;
                 if (rotorControl.azimuth.reference.IsClosed())
-                    return TurretGroupStatus.MajorDMG;
+                    return TurretGroupUtils.TurretGroupStatus.MajorDMG;
 
                 foreach (var elevationRot in rotorControl.elevationRotors)
                 {
                     if (elevationRot.rotor.IsClosed())
-                        return TurretGroupStatus.MajorDMG;
+                        return TurretGroupUtils.TurretGroupStatus.MajorDMG;
 
                     if (elevationRot.reference.IsClosed())
-                        damageAmount = TurretGroupStatus.MinorDMG;
+                        damageAmount = TurretGroupUtils.TurretGroupStatus.MinorDMG;
                 }
 
                 return damageAmount;
@@ -164,7 +164,7 @@ namespace IngameScript
                 TargetDirection(targetdir);
             }
 
-            public void FireCannons()
+            private void FireCannons()
             {
                 restMode = false;
 
@@ -182,14 +182,15 @@ namespace IngameScript
                         rotorControl.Lock(false);
                         return;
                     }
-                    
+
                     if (rotorControl.currentAccuracy > 0.9999)
                     {
                         rotorControl.Lock(true);
                         restMode = true;
                     }
-                        
-                } else if (currentTargetDir != Vector3D.Zero)
+
+                }
+                else if (currentTargetDir != Vector3D.Zero)
                 {
                     rotorControl.Lock(false);
                 }
@@ -199,7 +200,7 @@ namespace IngameScript
             {
                 var tmplist = new List<IMyMotorStator>();
 
-                for(int i = 0; i < elevation.Count; i++)
+                for (int i = 0; i < elevation.Count; i++)
                 {
                     var tmpRot = RotorLauncher.Selector(elevation[i].TopGrid);
                     if (tmpRot != null)
@@ -208,13 +209,6 @@ namespace IngameScript
                         elevation.RemoveAt(i);
                 }
                 return tmplist;
-            }
-
-            public enum TurretGroupStatus
-            {
-                Active,
-                MinorDMG,
-                MajorDMG,
             }
         }
     }

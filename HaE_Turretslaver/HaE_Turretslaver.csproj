@@ -96,6 +96,8 @@
     <Analyzer Include="c:\users\sirha\appdata\local\microsoft\visualstudio\15.0_d85c6838\extensions\caa0jahn.l1d\Analyzers\MDKAnalyzer.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GatlingTurretGroup.cs" />
+    <Compile Include="ITurretGroup.cs" />
     <Compile Include="MDK\Bootstrapper.cs" />
     <AdditionalFiles Include="MDK\MDK.options">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -105,8 +107,9 @@
     <AdditionalFiles Include="thumb.png" />
     <AdditionalFiles Include="MDK\whitelist.cache" />
     <Compile Include="RotorControl.cs" />
-    <Compile Include="TurretGroup.cs" />
+    <Compile Include="RotorTurretGroup.cs" />
     <Compile Include="StatusWriter.cs" />
+    <Compile Include="TurretGroupUtils.cs" />
   </ItemGroup>
   <Import Project="..\..\..\..\MDK_Projects\Shared Projects\EntityTrackingModule\EntityTrackingModule.projitems" Label="Shared" />
   <Import Project="..\..\..\..\MDK_Projects\Shared Projects\HaE GridTerminalSystemUtils\HaE GridTerminalSystemUtils.projitems" Label="Shared" />
