@@ -30,12 +30,10 @@ namespace IngameScript
             INISerializer turretConfig;
             public double azimuthMultiplier { get { return (double)turretConfig.GetValue("azimuthMultiplier"); } }
             public double elevationMultiplier { get { return (double)turretConfig.GetValue("elevationMultiplier"); } }
-            public int salvoSize { get { return (int)turretConfig.GetValue("salvoSize"); } }
-            public double salvoTimeout { get { return (double)turretConfig.GetValue("salvoTimeout"); } }
 
             RotorControl rotorControl;
-            List<RotorLauncher> launchers = new List<RotorLauncher>();
             IngameTime ingameTime;
+            List<IMyUserControllableGun> gatlingGuns;
 
 
             public GatlingTurretGroup(List<IMyMotorStator> rotors, IngameTime ingameTime, string azimuthTag, string elevationTag)
@@ -59,15 +57,11 @@ namespace IngameScript
                 IMyMotorStator azimuth = rotors.First(x => x.CustomName.Contains(azimuthTag));
                 defaultDir = azimuth.WorldMatrix.Forward;
 
-                List<IMyMotorStator> cannonBases = Select(elevation);
+                gatlingGuns = new List<IMyUserControllableGun>();
 
-                List<RotorControl.RotorReferencePair> elevationPairs = new List<RotorControl.RotorReferencePair>();
-                for (int i = 0; i < elevation.Count; i++)
-                {
-                    elevationPairs.Add(new RotorControl.RotorReferencePair { rotor = elevation[i], reference = cannonBases[i] });
-                }
+                List<RotorControl.RotorReferencePair> elevationPairs = Select(elevation, gatlingGuns);
 
-                RotorControl.RotorReferencePair azimuthPair = new RotorControl.RotorReferencePair { rotor = azimuth, reference = cannonBases[0] };
+                RotorControl.RotorReferencePair azimuthPair = new RotorControl.RotorReferencePair { rotor = azimuth, reference = gatlingGuns[0] };
 
                 rotorControl = new RotorControl(azimuthPair, elevationPairs);
                 rotorControl.onTarget = OnTarget;
@@ -77,8 +71,6 @@ namespace IngameScript
 
                 turretConfig.AddValue("azimuthMultiplier", x => double.Parse(x), -1.0);
                 turretConfig.AddValue("elevationMultiplier", x => double.Parse(x), -1.0);
-                turretConfig.AddValue("salvoSize", x => int.Parse(x), 3);
-                turretConfig.AddValue("salvoTimeout", x => double.Parse(x), 2.5);
 
                 if (rotorControl.azimuth.rotor.CustomData == "")
                 {
@@ -91,12 +83,6 @@ namespace IngameScript
                     turretConfig.DeSerialize(rotorControl.azimuth.rotor.CustomData);
                 }
                 #endregion
-
-                foreach (var cannonbase in cannonBases)
-                {
-                    var launcher = new RotorLauncher(cannonbase, ingameTime, salvoTimeout);
-                    launchers.Add(launcher);
-                }
             }
 
             public void Tick()
@@ -106,9 +92,6 @@ namespace IngameScript
 
                 if (inactive)
                     return;
-
-                foreach (var gun in launchers)
-                    gun.Tick();
 
                 if (currentTargetDir == Vector3D.Zero)
                 {
@@ -164,21 +147,13 @@ namespace IngameScript
                 TargetDirection(targetdir);
             }
 
-            private void FireCannons()
-            {
-                restMode = false;
-
-                foreach (var cannon in launchers)
-                    cannon.Salvo(salvoSize);
-            }
-
             private void OnTarget(bool val)
             {
                 if (val)
                 {
                     if (currentTargetDir != Vector3D.Zero)
                     {
-                        FireCannons();
+                        FireGuns(true);
                         rotorControl.Lock(false);
                         return;
                     }
@@ -192,23 +167,35 @@ namespace IngameScript
                 }
                 else if (currentTargetDir != Vector3D.Zero)
                 {
+                    FireGuns(false);
                     rotorControl.Lock(false);
                 }
             }
 
-            private List<IMyMotorStator> Select(List<IMyMotorStator> elevation)
+            private void FireGuns(bool fire)
             {
-                var tmplist = new List<IMyMotorStator>();
+                foreach (var gun in gatlingGuns)
+                {
+                    gun.SetValueBool("Shoot", fire);
+                }
+            }
+
+            private List<RotorControl.RotorReferencePair> Select(List<IMyMotorStator> elevation, List<IMyUserControllableGun> guns)
+            {
+                List<RotorControl.RotorReferencePair> elevationPairs = new List<RotorControl.RotorReferencePair>();
+                
 
                 for (int i = 0; i < elevation.Count; i++)
                 {
-                    var tmpRot = RotorLauncher.Selector(elevation[i].TopGrid);
-                    if (tmpRot != null)
-                        tmplist.Add(tmpRot);
-                    else
+                    int prevTempCount = guns.Count;
+                    elevation[i].TopGrid.GetCubesOfType(guns);
+
+                    if (prevTempCount == guns.Count)
                         elevation.RemoveAt(i);
+                    else
+                        elevationPairs.Add(new RotorControl.RotorReferencePair { rotor = elevation[i], reference = guns[prevTempCount] });
                 }
-                return tmplist;
+                return elevationPairs;
             }
         }
     }
