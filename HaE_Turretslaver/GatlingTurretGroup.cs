@@ -65,6 +65,7 @@ namespace IngameScript
 
                 rotorControl = new RotorControl(azimuthPair, elevationPairs);
                 rotorControl.onTarget = OnTarget;
+                rotorControl.useForward = true;
 
                 #region configuration
                 turretConfig = new INISerializer("TurretConfig");
@@ -95,6 +96,7 @@ namespace IngameScript
 
                 if (currentTargetDir == Vector3D.Zero)
                 {
+                    FireGuns(false);
                     rotorControl.AimAtTarget(defaultDir, azimuthMultiplier, elevationMultiplier);
                     return;
                 }

@@ -27,6 +27,8 @@ namespace IngameScript
             public RotorReferencePair azimuth;
             public List<RotorReferencePair> elevationRotors;
 
+            public bool useForward = false;
+
             public RotorControl(RotorReferencePair azimuth, List<RotorReferencePair> elevationRotors)
             {
                 this.azimuth = azimuth;
@@ -35,12 +37,12 @@ namespace IngameScript
 
             public void AimAtTarget(Vector3D desiredDirection, double azimuthMultiplier = -1, double elevationMultiplier = -1)
             {
-                Vector3D refDirAz = azimuth.reference.WorldMatrix.Up;
+                Vector3D refDirAz = !useForward ? azimuth.reference.WorldMatrix.Up : azimuth.reference.WorldMatrix.Forward;
                 RotorUtils.PointRotorAtVector(azimuth.rotor, azimuthMultiplier * desiredDirection, refDirAz, 2);
 
                 foreach (var elevation in elevationRotors)
                 {
-                    var refDirEl = elevation.reference.WorldMatrix.Up;
+                    var refDirEl = !useForward ? elevation.reference.WorldMatrix.Up : elevation.reference.WorldMatrix.Forward;
                     RotorUtils.PointRotorAtVector(elevation.rotor, elevationMultiplier * desiredDirection, refDirEl, 2);
 
                     CheckSetTarget(desiredDirection, refDirEl, elevation.rotor);

@@ -69,8 +69,8 @@ namespace IngameScript
             nameSerializer.AddValue("controllerName", x => x, "Controller");
             nameSerializer.AddValue("groupType", x => x, "Any");
             nameSerializer.AddValue("lcdStatusTag", x => x, "[GridcannonStatus]");
-            nameSerializer.AddValue("maxProjectileVel", x => double.Parse(x), 100);
-            nameSerializer.AddValue("maxGatlingBulletVel", x => double.Parse(x), 400);
+            nameSerializer.AddValue("maxProjectileVel", x => double.Parse(x), 100.0);
+            nameSerializer.AddValue("maxGatlingBulletVel", x => double.Parse(x), 400.0);
 
             if (Me.CustomData == "")
             {
@@ -145,7 +145,7 @@ namespace IngameScript
                     GridTerminalSystem.GetBlocksOfType(rotors, x => x.CustomName.Contains(gatlingTurretGroupTag));
                     foreach (var stator in rotors)
                     {
-                        AddRotorTurret(stator);
+                        AddGatlingTurret(stator);
                         yield return true;
                     }
                     break;
@@ -177,7 +177,7 @@ namespace IngameScript
                     GridTerminalSystem.GetBlocksOfType(rotorsA, x => x.CustomName.Contains(gatlingTurretGroupTag));
                     foreach (var stator in rotorsA)
                     {
-                        AddRotorTurret(stator);
+                        AddGatlingTurret(stator);
                         yield return true;
                     }
                     break;
@@ -379,8 +379,9 @@ namespace IngameScript
             gridCannonTargeting.NewTarget(entity.entityInfo);
             statusWriter.UpdateStatus(StatusWriter.TargetingStatus.Targeting);
 
-            basicTargeting.UpdateValues(control.GetVelocityVector(), control.GetPosition());
+            basicTargeting.UpdateValues(control.GetVelocityVector(), control.GetPosition(), maxGatlingBulletVel);
             var result = basicTargeting.CalculateTrajectory(entity.entityInfo);
+            Echo($"Result: {result.HasValue}");
             if (result.HasValue)
                 TargetSolvedGatling(result.Value);
         }
@@ -426,6 +427,12 @@ namespace IngameScript
             {
                 turretGroup.TargetDirection(Vector3D.Zero);
                 turretGroup.defaultDir = control.WorldMatrix.Forward;
+            }
+
+            foreach (GatlingTurretGroup group in gatlingTurretGroups)
+            {
+                group.TargetDirection(Vector3D.Zero);
+                group.defaultDir = control.WorldMatrix.Forward;
             }
 
             statusWriter.UpdateStatus(StatusWriter.TargetingStatus.Idle);
