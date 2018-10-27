@@ -134,6 +134,12 @@ namespace IngameScript
                         damageAmount = TurretGroupUtils.TurretGroupStatus.MinorDMG;
                 }
 
+                foreach (var gun in gatlingGuns)
+                {
+                    if (gun.IsClosed())
+                        damageAmount = TurretGroupUtils.TurretGroupStatus.MinorDMG;
+                }
+
                 return damageAmount;
             }
 
@@ -186,7 +192,7 @@ namespace IngameScript
             private List<RotorControl.RotorReferencePair> Select(List<IMyMotorStator> elevation, List<IMyUserControllableGun> guns)
             {
                 List<RotorControl.RotorReferencePair> elevationPairs = new List<RotorControl.RotorReferencePair>();
-                
+                int amountToRemove = 0;
 
                 for (int i = 0; i < elevation.Count; i++)
                 {
@@ -194,10 +200,14 @@ namespace IngameScript
                     elevation[i].TopGrid.GetCubesOfType(guns);
 
                     if (prevTempCount == guns.Count)
-                        elevation.RemoveAt(i);
+                    {
+                        elevation.Move(i, elevation.Count - 1);
+                        amountToRemove++;
+                    }
                     else
                         elevationPairs.Add(new RotorControl.RotorReferencePair { rotor = elevation[i], reference = guns[prevTempCount] });
                 }
+                elevation.RemoveRange(elevation.Count - amountToRemove, amountToRemove);
                 return elevationPairs;
             }
         }

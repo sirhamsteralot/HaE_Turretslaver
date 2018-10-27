@@ -235,7 +235,8 @@ namespace IngameScript
             if ((updateSource & UpdateType.Update10) != 0)
                 targetTracker.Poll();
             if ((updateSource & UpdateType.Update100) != 0)
-                CheckTurrets();
+                if (mainScheduler.QueueCount < 1)
+                    mainScheduler.AddTask(CheckTurrets());
 
 
             gridCannonTargeting.Tick();
@@ -245,7 +246,7 @@ namespace IngameScript
             #pragma warning restore
         }
 
-        public void CheckTurrets()
+        public IEnumerator<bool> CheckTurrets()
         {
             int normal = 0;
             int minor = 0;
@@ -268,6 +269,27 @@ namespace IngameScript
                         cannon.DisableTurret(true);
                         break;
                 }
+                yield return true;
+            }
+
+            foreach (var cannon in gatlingTurretGroups)
+            {
+                TurretGroupUtils.TurretGroupStatus status = cannon.CheckGroupStatus();
+
+                switch (status)
+                {
+                    case TurretGroupUtils.TurretGroupStatus.Active:
+                        normal++;
+                        break;
+                    case TurretGroupUtils.TurretGroupStatus.MinorDMG:
+                        minor++;
+                        break;
+                    case TurretGroupUtils.TurretGroupStatus.MajorDMG:
+                        major++;
+                        cannon.DisableTurret(true);
+                        break;
+                }
+                yield return true;
             }
 
             statusWriter.UpdateCannonCount(normal, minor, major);
