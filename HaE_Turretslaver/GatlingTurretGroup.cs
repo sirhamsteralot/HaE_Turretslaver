@@ -178,7 +178,8 @@ namespace IngameScript
             {
                 foreach (var gun in gatlingGuns)
                 {
-                    gun.SetValueBool("Shoot", fire);
+                    if (!gun.IsClosed())
+                        gun.SetValueBool("Shoot", fire);
                 }
             }
 
