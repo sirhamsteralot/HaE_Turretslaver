@@ -166,8 +166,11 @@ namespace IngameScript
                 TargetDirection(targetdir);
             }
 
-            private void FireCannons()
+            private void FireCannons(bool fire)
             {
+                if (!fire)
+                    return;
+
                 restMode = false;
 
                 foreach (var cannon in launchers)

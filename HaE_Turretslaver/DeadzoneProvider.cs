@@ -44,17 +44,27 @@ namespace IngameScript
             {
                 foreach (var grid in grids.Values)
                 {
-                    RayD line = new RayD(origin, targetPos);
-                    double? result = grid.grid.WorldVolume.Intersects(line);
-                    if (!result.HasValue)
-                        continue;
+                    double? result;
+                    if (!(grid.grid.WorldVolume.Contains(origin) == ContainmentType.Contains))
+                    {
+                        RayD line = new RayD(origin, targetPos);
+                        result = grid.grid.WorldVolume.Intersects(line);
+                        if (!result.HasValue)
+                            continue;
 
-                    Vector3D targetDir = targetPos - origin;
-                    targetDir.Normalize();
+                        Vector3D targetDir = targetPos - origin;
+                        targetDir.Normalize();
 
+                        if (grid.IsBlockInTheWay(origin + targetDir * result.Value, targetPos))
+                            return true;
+                    }                   
 
-                    if (grid.IsBlockInTheWay(origin + targetDir * result.Value, targetPos))
+                    if (grid.IsBlockInTheWay(origin, targetPos))
+                    {
+                        P.Echo(grid.grid.CustomName);
                         return true;
+                    }
+                        
                 }
 
                 return false;
@@ -78,7 +88,7 @@ namespace IngameScript
                     Vector3I relativePosRounded = new Vector3I((int)Math.Round(relativePos.X), (int)Math.Round(relativePos.Y), (int)Math.Round(relativePos.Z));
                     Vector3D relativeTargetPos = VectorUtils.TransformPosWorldToLocal(grid.WorldMatrix, targetPos);
 
-                    Vector3D direction = Vector3D.Normalize(relativeTargetPos - relativePos);
+                    Vector3D direction = Vector3D.Normalize(relativeTargetPos - relativePos) / grid.GridSize;
                     Vector3I directionInteger = new Vector3I((int)Math.Round(direction.X), (int)Math.Round(direction.Y), (int)Math.Round(direction.Z));
 
                     CalculationValues calcPackage = new CalculationValues
@@ -98,7 +108,7 @@ namespace IngameScript
                     if (!intersects.HasValue)
                         return false;
 
-                    Vector3I startPos = calcValues.relativePosRounded + calcValues.directionInteger * (int)Math.Round(intersects.Value);
+                    Vector3I startPos = calcValues.relativePosRounded + calcValues.directionInteger * (int)Math.Round(intersects.Value + grid.GridSize/2);
 
                     for (Vector3I searchPos = startPos;
                         (searchPos.X <= grid.Max.X && searchPos.X >= grid.Min.X) &&
