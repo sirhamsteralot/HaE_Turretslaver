@@ -96,6 +96,7 @@
     <Analyzer Include="c:\users\sirha\appdata\local\microsoft\visualstudio\15.0_d85c6838\extensions\caa0jahn.l1d\Analyzers\MDKAnalyzer.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DeadzoneProvider.cs" />
     <Compile Include="GatlingTurretGroup.cs" />
     <Compile Include="ITurretGroup.cs" />
     <Compile Include="MDK\Bootstrapper.cs" />

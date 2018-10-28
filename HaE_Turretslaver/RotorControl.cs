@@ -21,7 +21,7 @@ namespace IngameScript
     {
         public class RotorControl
         {
-            public Action<bool> onTarget;
+            public Action<bool, RotorReferencePair> onTarget;
             public double currentAccuracy = double.MaxValue;
 
             public RotorReferencePair azimuth;
@@ -45,7 +45,7 @@ namespace IngameScript
                     var refDirEl = !useForward ? elevation.reference.WorldMatrix.Up : elevation.reference.WorldMatrix.Forward;
                     RotorUtils.PointRotorAtVector(elevation.rotor, elevationMultiplier * desiredDirection, refDirEl, 2);
 
-                    CheckSetTarget(desiredDirection, refDirEl, elevation.rotor);
+                    CheckSetTarget(desiredDirection, refDirEl, elevation);
                 }
             }
 
@@ -59,16 +59,16 @@ namespace IngameScript
                 }
             }
 
-            private void CheckSetTarget(Vector3D desiredDir, Vector3D currentDir, IMyMotorStator rotor)
+            private void CheckSetTarget(Vector3D desiredDir, Vector3D currentDir, RotorReferencePair rotor)
             {
                 currentAccuracy = Vector3D.Dot(currentDir, desiredDir);
                 if (currentAccuracy > 0.999)
                 {
-                    onTarget?.Invoke(true);
+                    onTarget?.Invoke(true, rotor);
                 }
                 else
                 {
-                    onTarget?.Invoke(false);
+                    onTarget?.Invoke(false, rotor);
                 }
             }
 

@@ -31,26 +31,28 @@ namespace IngameScript
             public double azimuthMultiplier { get { return (double)turretConfig.GetValue("azimuthMultiplier"); } }
             public double elevationMultiplier { get { return (double)turretConfig.GetValue("elevationMultiplier"); } }
 
+            DeadzoneProvider deadzoneProvider;
             RotorControl rotorControl;
             IngameTime ingameTime;
             List<IMyUserControllableGun> gatlingGuns;
 
 
-            public GatlingTurretGroup(List<IMyMotorStator> rotors, IngameTime ingameTime, string azimuthTag, string elevationTag)
+            public GatlingTurretGroup(List<IMyMotorStator> rotors, IngameTime ingameTime, DeadzoneProvider deadzoneProvider, string azimuthTag, string elevationTag)
             {
-                Setup(rotors, ingameTime, azimuthTag, elevationTag);
+                Setup(rotors, ingameTime, deadzoneProvider, azimuthTag, elevationTag);
             }
 
-            public GatlingTurretGroup(IMyBlockGroup turretGroup, IngameTime ingameTime, string azimuthTag, string elevationTag)
+            public GatlingTurretGroup(IMyBlockGroup turretGroup, IngameTime ingameTime, DeadzoneProvider deadzoneProvider, string azimuthTag, string elevationTag)
             {
                 var rotors = new List<IMyMotorStator>();
                 turretGroup.GetBlocksOfType(rotors);
 
-                Setup(rotors, ingameTime, azimuthTag, elevationTag);
+                Setup(rotors, ingameTime, deadzoneProvider, azimuthTag, elevationTag);
             }
 
-            public void Setup(List<IMyMotorStator> rotors, IngameTime ingameTime, string azimuthTag, string elevationTag)
+            public void Setup(List<IMyMotorStator> rotors, IngameTime ingameTime, DeadzoneProvider deadzoneProvider, string azimuthTag, string elevationTag)
             {
+                this.deadzoneProvider = deadzoneProvider;
                 this.ingameTime = ingameTime;
 
                 List<IMyMotorStator> elevation = rotors.Where(x => x.CustomName.Contains(elevationTag)).ToList();
@@ -155,13 +157,14 @@ namespace IngameScript
                 TargetDirection(targetdir);
             }
 
-            private void OnTarget(bool val)
+            private void OnTarget(bool val, RotorControl.RotorReferencePair pair)
             {
                 if (val)
                 {
                     if (currentTargetDir != Vector3D.Zero)
                     {
-                        FireGuns(true);
+                        bool blockInTheWay = deadzoneProvider.IsBlockInTheWay(rotorControl.azimuth.reference.GetPosition() + currentTargetDir * 5, rotorControl.azimuth.reference.GetPosition() + currentTargetDir * 800);
+                        FireGuns(!blockInTheWay);
                         rotorControl.Lock(false);
                         return;
                     }

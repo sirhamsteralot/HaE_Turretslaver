@@ -32,27 +32,29 @@ namespace IngameScript
             public double elevationMultiplier { get { return (double)turretConfig.GetValue("elevationMultiplier"); } }
             public int salvoSize { get { return (int)turretConfig.GetValue("salvoSize"); } }
             public double salvoTimeout { get { return (double)turretConfig.GetValue("salvoTimeout"); } }
-            
+
+            DeadzoneProvider deadzoneProvider;
             RotorControl rotorControl;
             List<RotorLauncher> launchers = new List<RotorLauncher>();
             IngameTime ingameTime;
 
 
-            public RotorTurretGroup(List<IMyMotorStator> rotors, IngameTime ingameTime, string azimuthTag, string elevationTag)
+            public RotorTurretGroup(List<IMyMotorStator> rotors, IngameTime ingameTime, DeadzoneProvider deadzoneProvider, string azimuthTag, string elevationTag)
             {
-                Setup(rotors, ingameTime, azimuthTag, elevationTag);
+                Setup(rotors, ingameTime, deadzoneProvider, azimuthTag, elevationTag);
             }
 
-            public RotorTurretGroup(IMyBlockGroup turretGroup, IngameTime ingameTime, string azimuthTag, string elevationTag)
+            public RotorTurretGroup(IMyBlockGroup turretGroup, IngameTime ingameTime, DeadzoneProvider deadzoneProvider, string azimuthTag, string elevationTag)
             {
                 var rotors = new List<IMyMotorStator>();
                 turretGroup.GetBlocksOfType(rotors);
 
-                Setup (rotors, ingameTime, azimuthTag, elevationTag);
+                Setup(rotors, ingameTime, deadzoneProvider, azimuthTag, elevationTag);
             }
 
-            public void Setup(List<IMyMotorStator> rotors, IngameTime ingameTime, string azimuthTag, string elevationTag)
+            public void Setup(List<IMyMotorStator> rotors, IngameTime ingameTime, DeadzoneProvider deadzoneProvider, string azimuthTag, string elevationTag)
             {
+                this.deadzoneProvider = deadzoneProvider;
                 this.ingameTime = ingameTime;
 
                 List<IMyMotorStator> elevation = rotors.Where(x => x.CustomName.Contains(elevationTag)).ToList();
@@ -172,13 +174,14 @@ namespace IngameScript
                     cannon.Salvo(salvoSize);
             }
 
-            private void OnTarget(bool val)
+            private void OnTarget(bool val, RotorControl.RotorReferencePair pair)
             {
                 if (val)
                 {
                     if (currentTargetDir != Vector3D.Zero)
                     {
-                        FireCannons();
+                        bool blockInTheWay = deadzoneProvider.IsBlockInTheWay(rotorControl.azimuth.reference.GetPosition() + currentTargetDir * 5, rotorControl.azimuth.reference.GetPosition() + currentTargetDir * 800);
+                        FireCannons(!blockInTheWay);
                         rotorControl.Lock(false);
                         return;
                     }

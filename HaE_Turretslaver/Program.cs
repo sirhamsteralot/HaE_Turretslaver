@@ -35,6 +35,9 @@ namespace IngameScript
         public double maxGatlingBulletVel { get { return (double)nameSerializer.GetValue("maxGatlingBulletVel"); } }
         #endregion
 
+        public static Program P;
+
+        DeadzoneProvider deadzoneProvider;
 
         List<RotorTurretGroup> rotorTurretGroups;
         List<GatlingTurretGroup> gatlingTurretGroups;
@@ -51,13 +54,16 @@ namespace IngameScript
         IMyShipController control;
 
 
-        public Program() {
+        public Program()
+        {
+            P = this;
 
             GTSUtils = new GridTerminalSystemUtils(Me, GridTerminalSystem);
             mainScheduler = new Scheduler();
             ingameTime = new IngameTime();
             rotorTurretGroups = new List<RotorTurretGroup>();
             gatlingTurretGroups = new List<GatlingTurretGroup>();
+            deadzoneProvider = new DeadzoneProvider(GTSUtils);
 
             #region serializer
             nameSerializer = new INISerializer("Config");
@@ -297,7 +303,7 @@ namespace IngameScript
 
         public void AddRotorTurret(IMyBlockGroup group)
         {
-            var turretGroup = new RotorTurretGroup(group, ingameTime, azimuthTag, elevationTag);
+            var turretGroup = new RotorTurretGroup(group, ingameTime, deadzoneProvider, azimuthTag, elevationTag);
             turretGroup.TargetDirection(Vector3D.Zero);
             turretGroup.defaultDir = control.WorldMatrix.Forward;
 
@@ -307,7 +313,7 @@ namespace IngameScript
 
         public void AddGatlingTurret(IMyBlockGroup group)
         {
-            var turretGroup = new RotorTurretGroup(group, ingameTime, azimuthTag, elevationTag);
+            var turretGroup = new RotorTurretGroup(group, ingameTime, deadzoneProvider, azimuthTag, elevationTag);
             turretGroup.TargetDirection(Vector3D.Zero);
             turretGroup.defaultDir = control.WorldMatrix.Forward;
 
@@ -345,7 +351,7 @@ namespace IngameScript
                 currentTop.Clear();
             }
 
-            var turretGroup = new RotorTurretGroup(rotors, ingameTime, azimuthTag, elevationTag);
+            var turretGroup = new RotorTurretGroup(rotors, ingameTime, deadzoneProvider, azimuthTag, elevationTag);
             turretGroup.TargetDirection(Vector3D.Zero);
             turretGroup.defaultDir = control.WorldMatrix.Forward;
 
@@ -379,7 +385,7 @@ namespace IngameScript
                 currentTop.Clear();
             }
 
-            var turretGroup = new GatlingTurretGroup(rotors, ingameTime, azimuthTag, elevationTag);
+            var turretGroup = new GatlingTurretGroup(rotors, ingameTime, deadzoneProvider, azimuthTag, elevationTag);
             turretGroup.TargetDirection(Vector3D.Zero);
             turretGroup.defaultDir = control.WorldMatrix.Forward;
 
@@ -403,7 +409,6 @@ namespace IngameScript
 
             basicTargeting.UpdateValues(control.GetVelocityVector(), control.GetPosition(), maxGatlingBulletVel);
             var result = basicTargeting.CalculateTrajectory(entity.entityInfo);
-            Echo($"Result: {result.HasValue}");
             if (result.HasValue)
                 TargetSolvedGatling(result.Value);
         }
