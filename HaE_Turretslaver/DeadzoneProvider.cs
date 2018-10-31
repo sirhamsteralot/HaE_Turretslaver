@@ -84,17 +84,16 @@ namespace IngameScript
 
                 public bool IsBlockInTheWay(Vector3D origin, Vector3D targetPos)
                 {
-                    Vector3D relativePos = VectorUtils.TransformPosWorldToLocal(grid.WorldMatrix, origin);
-                    Vector3I relativePosRounded = new Vector3I((int)Math.Round(relativePos.X), (int)Math.Round(relativePos.Y), (int)Math.Round(relativePos.Z));
-                    Vector3D relativeTargetPos = VectorUtils.TransformPosWorldToLocal(grid.WorldMatrix, targetPos);
+                    Vector3I relativePos = grid.WorldToGridInteger(origin);
+                    
+                    Vector3I relativeTargetPos = grid.WorldToGridInteger(targetPos);
 
-                    Vector3D direction = Vector3D.Normalize(relativeTargetPos - relativePos) / grid.GridSize;
-                    Vector3I directionInteger = new Vector3I((int)Math.Round(direction.X), (int)Math.Round(direction.Y), (int)Math.Round(direction.Z));
+                    Vector3D direction = (relativeTargetPos - relativePos);
 
                     CalculationValues calcPackage = new CalculationValues
                     {
-                        relativePosRounded = relativePosRounded,
-                        directionInteger = directionInteger
+                        relativePosRounded = relativePos,
+                        direction = direction
                     };
 
                     return cachedBlockSearch.Execute(calcPackage);
@@ -103,20 +102,21 @@ namespace IngameScript
                 public bool IsBlockInTheWay(CalculationValues calcValues)
                 {
                     BoundingBox box = new BoundingBox(grid.Min, grid.Max);
-                    var Ray = new Ray(calcValues.relativePosRounded, calcValues.directionInteger);
+                    var Ray = new Ray(calcValues.relativePosRounded, calcValues.direction);
                     float? intersects = box.Intersects(Ray);
                     if (!intersects.HasValue)
                         return false;
 
-                    Vector3I startPos = calcValues.relativePosRounded + calcValues.directionInteger * (int)Math.Round(intersects.Value + grid.GridSize/2);
+                    Vector3I startPos = (Vector3I)((Vector3D)calcValues.relativePosRounded + ((intersects.Value + 1) * Vector3D.Normalize(calcValues.direction)));
+                    Vector3D searchDir = Vector3D.Normalize(calcValues.direction);
 
-                    for (Vector3I searchPos = startPos;
+                    for (Vector3D searchPos = startPos;
                         (searchPos.X <= grid.Max.X && searchPos.X >= grid.Min.X) &&
                         (searchPos.Y <= grid.Max.Y && searchPos.Y >= grid.Min.Y) &&
                         (searchPos.Z <= grid.Max.Z && searchPos.Z >= grid.Min.Z);
-                        searchPos += calcValues.directionInteger)
+                        searchPos = (searchPos + searchDir))
                     {
-                        if (grid.CubeExists(searchPos))
+                        if (grid.CubeExists((Vector3I)searchPos))
                         {
                             return true;
                         }
@@ -128,11 +128,11 @@ namespace IngameScript
                 public struct CalculationValues
                 {
                     public Vector3I relativePosRounded;
-                    public Vector3I directionInteger;
+                    public Vector3D direction;
 
                     public override int GetHashCode()
                     {
-                        return relativePosRounded.GetHashCode() ^ directionInteger.GetHashCode();
+                        return relativePosRounded.GetHashCode() ^ direction.GetHashCode();
                     }
 
                     public override bool Equals(object obj)
@@ -141,7 +141,7 @@ namespace IngameScript
                             return false;
 
                         var values = (CalculationValues)obj;
-                        return values.directionInteger.Equals(directionInteger) && values.relativePosRounded.Equals(relativePosRounded);
+                        return values.direction.Equals(direction) && values.relativePosRounded.Equals(relativePosRounded);
                     }
                 }
 
