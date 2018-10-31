@@ -33,6 +33,7 @@ namespace IngameScript
         public string lcdStatusTag { get { return (string)nameSerializer.GetValue("lcdStatusTag"); } }
         public double maxProjectileVel { get { return (double)nameSerializer.GetValue("maxProjectileVel"); } }
         public double maxGatlingBulletVel { get { return (double)nameSerializer.GetValue("maxGatlingBulletVel"); } }
+        public bool enableAutoDeadzoning { get { return (bool)nameSerializer.GetValue("enableAutoDeadzoning"); } }
         #endregion
 
         DeadzoneProvider deadzoneProvider;
@@ -54,13 +55,6 @@ namespace IngameScript
 
         public Program()
         {
-            GTSUtils = new GridTerminalSystemUtils(Me, GridTerminalSystem);
-            mainScheduler = new Scheduler();
-            ingameTime = new IngameTime();
-            rotorTurretGroups = new List<RotorTurretGroup>();
-            gatlingTurretGroups = new List<GatlingTurretGroup>();
-            deadzoneProvider = new DeadzoneProvider(GTSUtils);
-
             #region serializer
             nameSerializer = new INISerializer("Config");
 
@@ -73,6 +67,7 @@ namespace IngameScript
             nameSerializer.AddValue("lcdStatusTag", x => x, "[GridcannonStatus]");
             nameSerializer.AddValue("maxProjectileVel", x => double.Parse(x), 100.0);
             nameSerializer.AddValue("maxGatlingBulletVel", x => double.Parse(x), 400.0);
+            nameSerializer.AddValue("enableAutoDeadzoning", x => bool.Parse(x), true);
 
             if (Me.CustomData == "")
             {
@@ -85,6 +80,14 @@ namespace IngameScript
                 nameSerializer.DeSerialize(Me.CustomData);
             }
             #endregion
+
+            GTSUtils = new GridTerminalSystemUtils(Me, GridTerminalSystem);
+            mainScheduler = new Scheduler();
+            ingameTime = new IngameTime();
+            rotorTurretGroups = new List<RotorTurretGroup>();
+            gatlingTurretGroups = new List<GatlingTurretGroup>();
+            deadzoneProvider = new DeadzoneProvider(GTSUtils);
+            deadzoneProvider.Enabled = enableAutoDeadzoning;
 
             mainScheduler.AddTask(Init());
 

@@ -22,6 +22,8 @@ namespace IngameScript
         public class DeadzoneProvider
         {
             private Dictionary<long, GridDeadzone> grids = new Dictionary<long, GridDeadzone>();
+            public bool Enabled = true;
+
 
             public DeadzoneProvider(GridTerminalSystemUtils gtsUtils)
             {
@@ -42,6 +44,9 @@ namespace IngameScript
 
             public bool IsBlockInTheWay(Vector3D origin, Vector3D targetPos)
             {
+                if (!Enabled)
+                    return false;
+
                 Vector3D targetDir = targetPos - origin;
                 RayD line = new RayD(origin, targetDir);
 
