@@ -25,6 +25,7 @@ namespace IngameScript
             public bool restMode = false;
             public bool inactive = false;
 
+            private bool firing = false;
             Vector3D currentTargetDir;
 
             INISerializer turretConfig;
@@ -185,6 +186,11 @@ namespace IngameScript
 
             private void FireGuns(bool fire)
             {
+                if (fire == firing)
+                    return;
+
+                firing = fire;
+
                 foreach (var gun in gatlingGuns)
                 {
                     if (!gun.IsClosed())
