@@ -42,22 +42,23 @@ namespace IngameScript
 
             public bool IsBlockInTheWay(Vector3D origin, Vector3D targetPos)
             {
+                Vector3D targetDir = targetPos - origin;
+                RayD line = new RayD(origin, targetDir);
+
                 foreach (var grid in grids.Values)
                 {
                     double? result;
-                    if (!(grid.grid.WorldVolume.Contains(origin) == ContainmentType.Contains))
+                    if (grid.grid.WorldVolume.Contains(origin) != ContainmentType.Contains)
                     {
-                        RayD line = new RayD(origin, targetPos);
                         result = grid.grid.WorldVolume.Intersects(line);
                         if (!result.HasValue)
                             continue;
 
-                        Vector3D targetDir = targetPos - origin;
                         targetDir.Normalize();
 
                         if (grid.IsBlockInTheWay(origin + targetDir * result.Value, targetPos))
                             return true;
-                    }                   
+                    }
 
                     if (grid.IsBlockInTheWay(origin, targetPos))
                     {
@@ -108,8 +109,8 @@ namespace IngameScript
                     if (!intersects.HasValue)
                         return false;
 
-                    Vector3I startPos = (Vector3I)((Vector3D)calcValues.relativePosRounded + ((intersects.Value + 1) * Vector3D.Normalize(calcValues.direction)));
                     Vector3D searchDir = Vector3D.Normalize(calcValues.direction);
+                    Vector3I startPos = (Vector3I)((Vector3D)calcValues.relativePosRounded + ((intersects.Value + 1) * searchDir));
 
                     for (Vector3D searchPos = startPos;
                         (searchPos.X <= grid.Max.X && searchPos.X >= grid.Min.X) &&
