@@ -19,7 +19,7 @@ namespace IngameScript
 {
     partial class Program : MyGridProgram
     {
-        public const bool DEBUG = false;
+        public const bool DEBUG = true;
 
         #region iniSerializer
         INISerializer nameSerializer;
@@ -34,8 +34,6 @@ namespace IngameScript
         public double maxProjectileVel { get { return (double)nameSerializer.GetValue("maxProjectileVel"); } }
         public double maxGatlingBulletVel { get { return (double)nameSerializer.GetValue("maxGatlingBulletVel"); } }
         #endregion
-
-        public static Program P;
 
         DeadzoneProvider deadzoneProvider;
 
@@ -56,8 +54,6 @@ namespace IngameScript
 
         public Program()
         {
-            P = this;
-
             GTSUtils = new GridTerminalSystemUtils(Me, GridTerminalSystem);
             mainScheduler = new Scheduler();
             ingameTime = new IngameTime();
@@ -195,6 +191,7 @@ namespace IngameScript
 
 
         double averageTotalInstructionCount;
+        double averageCheckTurretsInstructionCount;
         double averageTargetTrackerInstructionCount;
         double averageGridTargetingInstructionCount;
         double averageTurretGroupInstructionCount;
@@ -217,6 +214,13 @@ namespace IngameScript
                 averageTargetTrackerInstructionCount = tempCount * 0.01 + averageTargetTrackerInstructionCount * 0.99;
 
                 tempCount = Runtime.CurrentInstructionCount;
+                if ((updateSource & UpdateType.Update100) != 0)
+                    if (mainScheduler.QueueCount < 1)
+                        mainScheduler.AddTask(CheckTurrets());
+                tempCount = Runtime.CurrentInstructionCount - tempCount;
+                averageCheckTurretsInstructionCount = tempCount * 0.01 + averageCheckTurretsInstructionCount * 0.99;
+
+                tempCount = Runtime.CurrentInstructionCount;
                 gridCannonTargeting.Tick();
                 tempCount = Runtime.CurrentInstructionCount - tempCount;
                 averageGridTargetingInstructionCount = tempCount * 0.01 + averageGridTargetingInstructionCount * 0.99;
@@ -228,11 +232,14 @@ namespace IngameScript
 
                 ingameTime.Tick(Runtime.TimeSinceLastRun);
 
-                Echo($"turretCount: {rotorTurretGroups.Count}");
-                Echo($"target restMode:  {gridCannonTargeting.restMode}");
+                Echo($"turretCount: {rotorTurretGroups.Count + gatlingTurretGroups.Count}");
 
                 averageTotalInstructionCount = Runtime.CurrentInstructionCount * 0.01 + averageTotalInstructionCount * 0.99;
-                Echo($"\nComplexity:\nTotal: {averageTotalInstructionCount: #.##}\nTargetTracker: {averageTargetTrackerInstructionCount: #.##}\nGridTargeting: {averageGridTargetingInstructionCount: #.##}\nTurretGroup: {averageTurretGroupInstructionCount: #.##}");
+                Echo($"\nComplexity:\nTotal: {averageTotalInstructionCount: #.##}\n" +
+                    $"TargetTracker: {averageTargetTrackerInstructionCount: #.##}\n" +
+                    $"CheckTurrets: {averageCheckTurretsInstructionCount: #.##}\n" +
+                    $"GridTargeting: {averageGridTargetingInstructionCount: #.##}\n" +
+                    $"TurretGroup: {averageTurretGroupInstructionCount: #.##}");
                 Echo($"\nlastRuntime: {Runtime.LastRunTimeMs: #.##}");
                 return;
             }

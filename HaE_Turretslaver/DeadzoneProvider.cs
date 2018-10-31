@@ -61,7 +61,6 @@ namespace IngameScript
 
                     if (grid.IsBlockInTheWay(origin, targetPos))
                     {
-                        P.Echo(grid.grid.CustomName);
                         return true;
                     }
                         
@@ -75,11 +74,13 @@ namespace IngameScript
                 public IMyCubeGrid grid;
                 private Dictionary<Vector3I, BlockDeadzone> blocksInTheWay = new Dictionary<Vector3I, BlockDeadzone>();
                 private CachedFunction<CalculationValues, bool> cachedBlockSearch;
+                private CachedFunction<Vector3I, bool> cubeExists;
 
                 public GridDeadzone(IMyCubeGrid grid)
                 {
                     this.grid = grid;
                     cachedBlockSearch = new CachedFunction<CalculationValues, bool>(IsBlockInTheWay);
+                    cubeExists = new CachedFunction<Vector3I, bool>(grid.CubeExists);
                 }
 
                 public bool IsBlockInTheWay(Vector3D origin, Vector3D targetPos)
@@ -116,7 +117,7 @@ namespace IngameScript
                         (searchPos.Z <= grid.Max.Z && searchPos.Z >= grid.Min.Z);
                         searchPos = (searchPos + searchDir))
                     {
-                        if (grid.CubeExists((Vector3I)searchPos))
+                        if (cubeExists.Execute((Vector3I)searchPos))
                         {
                             return true;
                         }
