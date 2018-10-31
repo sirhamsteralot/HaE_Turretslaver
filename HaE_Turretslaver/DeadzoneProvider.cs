@@ -89,7 +89,7 @@ namespace IngameScript
                     
                     Vector3I relativeTargetPos = grid.WorldToGridInteger(targetPos);
 
-                    Vector3D direction = (relativeTargetPos - relativePos);
+                    Vector3I direction = (Vector3I)(relativeTargetPos - relativePos);
 
                     CalculationValues calcPackage = new CalculationValues
                     {
@@ -129,7 +129,7 @@ namespace IngameScript
                 public struct CalculationValues
                 {
                     public Vector3I relativePosRounded;
-                    public Vector3D direction;
+                    public Vector3I direction;
 
                     public override int GetHashCode()
                     {
