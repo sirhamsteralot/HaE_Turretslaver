@@ -69,7 +69,7 @@ namespace IngameScript
                 }
 
                 currentAccuracy = Vector3D.Dot(currentDir, desiredDir);
-                if (currentAccuracy > 0.99)
+                if (currentAccuracy > 0.995)
                 {
                     onTarget?.Invoke(true, rotor);
                 }
