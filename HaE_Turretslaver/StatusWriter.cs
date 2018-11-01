@@ -89,7 +89,7 @@ namespace IngameScript
                 buffer.Append($"TargetingStatus: {currentStatus}...\n");
                 buffer.Append($"Active turrets: {healthyCannonCount}\n");
                 buffer.Append($"Minor damage: {minorDamageCount}\n");
-                buffer.Append($"Major damage: {majorDamageCount}");
+                buffer.Append($"Major damage: {majorDamageCount}\n");
                 buffer.Append($"Uninitializable: {uninitializableCount}");
 
                 switch (currentStatus)
