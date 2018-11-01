@@ -26,6 +26,7 @@ namespace IngameScript
             private int healthyCannonCount;
             private int minorDamageCount;
             private int majorDamageCount;
+            private int uninitializableCount;
 
             private bool update;
 
@@ -52,6 +53,12 @@ namespace IngameScript
                     return;
 
                 currentStatus = targetingStatus;
+                update = true;
+            }
+
+            public void AddUninitializable(int amount)
+            {
+                uninitializableCount += amount;
                 update = true;
             }
 
@@ -83,6 +90,7 @@ namespace IngameScript
                 buffer.Append($"Active turrets: {healthyCannonCount}\n");
                 buffer.Append($"Minor damage: {minorDamageCount}\n");
                 buffer.Append($"Major damage: {majorDamageCount}");
+                buffer.Append($"Uninitializable: {uninitializableCount}");
 
                 switch (currentStatus)
                 {

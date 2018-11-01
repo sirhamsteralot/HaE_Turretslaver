@@ -59,10 +59,17 @@ namespace IngameScript
                 }
             }
 
+            int delayTicks;
             private void CheckSetTarget(Vector3D desiredDir, Vector3D currentDir, RotorReferencePair rotor)
             {
+                if (delayTicks++ > 100)
+                {
+                    delayTicks = 0;
+                    return;
+                }
+
                 currentAccuracy = Vector3D.Dot(currentDir, desiredDir);
-                if (currentAccuracy > 0.999)
+                if (currentAccuracy > 0.99)
                 {
                     onTarget?.Invoke(true, rotor);
                 }
