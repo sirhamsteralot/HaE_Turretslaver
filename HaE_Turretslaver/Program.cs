@@ -453,6 +453,9 @@ namespace IngameScript
         
         public void OnEntityDetected(HaE_Entity entity)
         {
+            if (Vector3D.DistanceSquared(entity.entityInfo.Position, control.GetPosition()) > 1000 * 1000)
+                return;
+
             if (IgnoreEventAfterOnce)
                 return;
 
