@@ -125,7 +125,7 @@ namespace IngameScript
                     int y2 = startPos.Y + calcValues.direction.Y;
                     int z2 = startPos.Z + calcValues.direction.Z;
 
-
+                    // Bresenham algorythm, implementation borrowed from https://gist.github.com/yamamushi/5823518
                     int i, dx, dy, dz, l, m, n, x_inc, y_inc, z_inc, err_1, err_2, dx2, dy2, dz2;
                     int[] point = new int[3];
 
@@ -151,6 +151,14 @@ namespace IngameScript
                         err_2 = dz2 - l;
                         for (i = 0; i < l; i++)
                         {
+
+                            if (!((point[0] <= grid.Max.X && point[0] >= grid.Min.X) &&
+                                (point[1] <= grid.Max.Y && point[1] >= grid.Min.Y) &&
+                                (point[2] <= grid.Max.Z && point[2] >= grid.Min.Z)))
+                            {
+                                return false;
+                            }
+
                             if (cubeExists.Execute(new Vector3I(point[0], point[1], point[2])))
                             {
                                 return true;
@@ -177,6 +185,13 @@ namespace IngameScript
                         err_2 = dz2 - m;
                         for (i = 0; i < m; i++)
                         {
+                            if (!((point[0] <= grid.Max.X && point[0] >= grid.Min.X) &&
+                                (point[1] <= grid.Max.Y && point[1] >= grid.Min.Y) &&
+                                (point[2] <= grid.Max.Z && point[2] >= grid.Min.Z)))
+                            {
+                                return false;
+                            }
+
                             if (cubeExists.Execute(new Vector3I(point[0], point[1], point[2])))
                             {
                                 return true;
@@ -203,6 +218,14 @@ namespace IngameScript
                         err_2 = dx2 - n;
                         for (i = 0; i < n; i++)
                         {
+
+                            if (!((point[0] <= grid.Max.X && point[0] >= grid.Min.X) &&
+                                (point[1] <= grid.Max.Y && point[1] >= grid.Min.Y) &&
+                                (point[2] <= grid.Max.Z && point[2] >= grid.Min.Z)))
+                            {
+                                return false;
+                            }
+
                             if (cubeExists.Execute(new Vector3I(point[0], point[1], point[2])))
                             {
                                 return true;
