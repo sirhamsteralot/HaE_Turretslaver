@@ -117,16 +117,116 @@ namespace IngameScript
                     Vector3D searchDir = Vector3D.Normalize(calcValues.direction);
                     Vector3I startPos = (Vector3I)((Vector3D)calcValues.relativePosRounded + ((intersects.Value + 1) * searchDir));
 
-                    for (Vector3D searchPos = startPos;
-                        (searchPos.X <= grid.Max.X && searchPos.X >= grid.Min.X) &&
-                        (searchPos.Y <= grid.Max.Y && searchPos.Y >= grid.Min.Y) &&
-                        (searchPos.Z <= grid.Max.Z && searchPos.Z >= grid.Min.Z);
-                        searchPos = (searchPos + searchDir))
+                    int x1 = startPos.X;
+                    int y1 = startPos.Y;
+                    int z1 = startPos.Z;
+
+                    int x2 = startPos.X + calcValues.direction.X;
+                    int y2 = startPos.Y + calcValues.direction.Y;
+                    int z2 = startPos.Z + calcValues.direction.Z;
+
+
+                    int i, dx, dy, dz, l, m, n, x_inc, y_inc, z_inc, err_1, err_2, dx2, dy2, dz2;
+                    int[] point = new int[3];
+
+                    point[0] = x1;
+                    point[1] = y1;
+                    point[2] = z1;
+                    dx = x2 - x1;
+                    dy = y2 - y1;
+                    dz = z2 - z1;
+                    x_inc = (dx < 0) ? -1 : 1;
+                    l = Math.Abs(dx);
+                    y_inc = (dy < 0) ? -1 : 1;
+                    m = Math.Abs(dy);
+                    z_inc = (dz < 0) ? -1 : 1;
+                    n = Math.Abs(dz);
+                    dx2 = l << 1;
+                    dy2 = m << 1;
+                    dz2 = n << 1;
+
+                    if ((l >= m) && (l >= n))
                     {
-                        if (cubeExists.Execute((Vector3I)searchPos))
+                        err_1 = dy2 - l;
+                        err_2 = dz2 - l;
+                        for (i = 0; i < l; i++)
                         {
-                            return true;
+                            if (cubeExists.Execute(new Vector3I(point[0], point[1], point[2])))
+                            {
+                                return true;
+                            }
+
+                            if (err_1 > 0)
+                            {
+                                point[1] += y_inc;
+                                err_1 -= dx2;
+                            }
+                            if (err_2 > 0)
+                            {
+                                point[2] += z_inc;
+                                err_2 -= dx2;
+                            }
+                            err_1 += dy2;
+                            err_2 += dz2;
+                            point[0] += x_inc;
                         }
+                    }
+                    else if ((m >= l) && (m >= n))
+                    {
+                        err_1 = dx2 - m;
+                        err_2 = dz2 - m;
+                        for (i = 0; i < m; i++)
+                        {
+                            if (cubeExists.Execute(new Vector3I(point[0], point[1], point[2])))
+                            {
+                                return true;
+                            }
+
+                            if (err_1 > 0)
+                            {
+                                point[0] += x_inc;
+                                err_1 -= dy2;
+                            }
+                            if (err_2 > 0)
+                            {
+                                point[2] += z_inc;
+                                err_2 -= dy2;
+                            }
+                            err_1 += dx2;
+                            err_2 += dz2;
+                            point[1] += y_inc;
+                        }
+                    }
+                    else
+                    {
+                        err_1 = dy2 - n;
+                        err_2 = dx2 - n;
+                        for (i = 0; i < n; i++)
+                        {
+                            if (cubeExists.Execute(new Vector3I(point[0], point[1], point[2])))
+                            {
+                                return true;
+                            }
+
+                            if (err_1 > 0)
+                            {
+                                point[1] += y_inc;
+                                err_1 -= dz2;
+                            }
+                            if (err_2 > 0)
+                            {
+                                point[0] += x_inc;
+                                err_2 -= dz2;
+                            }
+                            err_1 += dy2;
+                            err_2 += dx2;
+                            point[2] += z_inc;
+                        }
+                    }
+
+                    if (cubeExists.Execute(new Vector3I(point[0], point[1], point[2])))
+                    {
+                        return true;
                     }
 
                     return false;
