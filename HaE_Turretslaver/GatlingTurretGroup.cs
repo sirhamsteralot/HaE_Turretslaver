@@ -164,7 +164,7 @@ namespace IngameScript
                 {
                     if (currentTargetDir != Vector3D.Zero)
                     {
-                        bool blockInTheWay = deadzoneProvider.IsBlockInTheWay(rotorControl.azimuth.reference.GetPosition() + currentTargetDir * 5, rotorControl.azimuth.reference.GetPosition() + currentTargetDir * 800);
+                        bool blockInTheWay = deadzoneProvider.IsBlockInTheWay(rotorControl.azimuth.reference.GetPosition() + currentTargetDir * 2.5, rotorControl.azimuth.reference.GetPosition() + currentTargetDir * 800);
                         FireGuns(!blockInTheWay);
                         rotorControl.Lock(false);
                         return;
