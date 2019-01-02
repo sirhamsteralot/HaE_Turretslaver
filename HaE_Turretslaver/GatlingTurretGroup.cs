@@ -149,6 +149,14 @@ namespace IngameScript
 
             public void TargetDirection(Vector3D targetDirection)
             {
+                bool blockInTheWay = deadzoneProvider.IsBlockInTheWay(rotorControl.azimuth.reference.GetPosition() + targetDirection * 2.5, rotorControl.azimuth.reference.GetPosition() + targetDirection * 800);
+                if (blockInTheWay)
+                {
+                    currentTargetDir = Vector3D.Zero;
+                    restAfterReset = true;
+                    return;
+                }
+
                 currentTargetDir = targetDirection;
                 restMode = false;
                 restAfterReset = false;
