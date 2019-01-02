@@ -111,6 +111,12 @@ namespace IngameScript
 
 
             targetTracker = new EntityTracking_Module(GTSUtils, control, null);
+            foreach (var tracker in targetTracker.ObjectTrackers)
+            {
+                var turretTracker = tracker as TurretTracking;
+                if (turretTracker != null)
+                    turretTracker.earlyReturn = true;
+            }
             targetTracker.onEntityDetected += OnEntityDetected;
 
             gridCannonTargeting = new GridCannonTargeting(control, ingameTime, maxProjectileVel);
