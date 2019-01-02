@@ -21,6 +21,8 @@ namespace IngameScript
     {
         public class GatlingTurretGroup : ITurretGroup
         {
+            private const double accuracyVal = 0.9999;
+
             public Vector3D defaultDir;
             public bool restMode = false;
             public bool inactive = false;
@@ -149,6 +151,17 @@ namespace IngameScript
 
             public void TargetDirection(Vector3D targetDirection)
             {
+                if (targetDirection == Vector3D.Zero)
+                {
+                    currentTargetDir = targetDirection;
+                    restMode = false;
+                    restAfterReset = false;
+                    return;
+                }
+
+                if (currentTargetDir != Vector3D.Zero && targetDirection != Vector3D.Zero && currentTargetDir.Dot(targetDirection) < 1 - accuracyVal)
+                    return;
+
                 bool blockInTheWay = deadzoneProvider.IsBlockInTheWay(rotorControl.azimuth.reference.GetPosition() + targetDirection * 2.5, rotorControl.azimuth.reference.GetPosition() + targetDirection * 800);
                 if (blockInTheWay)
                 {
@@ -180,7 +193,7 @@ namespace IngameScript
                         return;
                     }
 
-                    if (rotorControl.currentAccuracy > 0.9999 && restAfterReset)
+                    if (rotorControl.currentAccuracy > accuracyVal && restAfterReset)
                     {
                         rotorControl.Lock(true);
                         restMode = true;

@@ -42,16 +42,22 @@ namespace IngameScript
                 }
             }
 
-            public bool IsBlockInTheWay(Vector3D origin, Vector3D targetPos)
+            public bool IsBlockInTheWay(Vector3D origin, Vector3D targetPos, IMyCubeBlock constructBlock = null)
             {
                 if (!Enabled)
                     return false;
+
+
 
                 Vector3D targetDir = targetPos - origin;
                 RayD line = new RayD(origin, targetDir);
 
                 foreach (var grid in grids.Values)
                 {
+                    if (constructBlock != null)
+                        if (!constructBlock.CubeGrid.IsSameConstructAs(grid.grid))
+                            continue;
+
                     double? result;
                     if (grid.grid.WorldVolume.Contains(origin) != ContainmentType.Contains)
                     {

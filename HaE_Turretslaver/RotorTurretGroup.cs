@@ -21,6 +21,8 @@ namespace IngameScript
     {
         public class RotorTurretGroup : ITurretGroup
         {
+            private const double accuracyVal = 0.9999;
+
             public Vector3D defaultDir;
             public bool restMode = false;
             public bool inactive = false;
@@ -157,13 +159,19 @@ namespace IngameScript
 
             public void TargetDirection(Vector3D targetDirection)
             {
-                bool blockInTheWay = deadzoneProvider.IsBlockInTheWay(rotorControl.azimuth.reference.GetPosition() + targetDirection * 15, rotorControl.azimuth.reference.GetPosition() + targetDirection * 800);
-                if (blockInTheWay)
-                {
-                    currentTargetDir = Vector3D.Zero;
-                    restAfterReset = true;
+                if (currentTargetDir != Vector3D.Zero && targetDirection != Vector3D.Zero && currentTargetDir.Dot(targetDirection) < 1 - accuracyVal)
                     return;
-                }
+
+                //bool blockInTheWay = deadzoneProvider.IsBlockInTheWay(
+                //    rotorControl.azimuth.reference.GetPosition() + targetDirection * 15,
+                //    rotorControl.azimuth.reference.GetPosition() + targetDirection * 800,
+                //    rotorControl.azimuth.rotor);
+                //if (blockInTheWay)
+                //{
+                //    currentTargetDir = Vector3D.Zero;
+                //    restAfterReset = true;
+                //    return;
+                //}
 
                 currentTargetDir = targetDirection;
                 restMode = false;
@@ -200,7 +208,7 @@ namespace IngameScript
                         return;
                     }
                     
-                    if (rotorControl.currentAccuracy > 0.9999 && restAfterReset)
+                    if (rotorControl.currentAccuracy > accuracyVal && restAfterReset)
                     {
                         rotorControl.Lock(true);
                         restMode = true;
