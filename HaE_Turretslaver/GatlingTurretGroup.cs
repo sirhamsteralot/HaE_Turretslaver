@@ -38,7 +38,7 @@ namespace IngameScript
             DeadzoneProvider deadzoneProvider;
             RotorControl rotorControl;
             IngameTime ingameTime;
-            List<IMyUserControllableGun> gatlingGuns;
+            IMyUserControllableGun[] gatlingGuns;
 
 
             public GatlingTurretGroup(List<IMyMotorStator> rotors, IngameTime ingameTime, DeadzoneProvider deadzoneProvider, string azimuthTag, string elevationTag)
@@ -63,11 +63,18 @@ namespace IngameScript
                 IMyMotorStator azimuth = rotors.First(x => x.CustomName.Contains(azimuthTag));
                 defaultDir = azimuth.WorldMatrix.Forward;
 
-                gatlingGuns = new List<IMyUserControllableGun>();
+                List<IMyUserControllableGun> gatlingGunsList = new List<IMyUserControllableGun>();
 
-                List<RotorControl.RotorReferencePair> elevationPairs = Select(elevation, gatlingGuns);
+                List<RotorControl.RotorReferencePair> elevationPairs = Select(elevation, gatlingGunsList);
 
-                RotorControl.RotorReferencePair azimuthPair = new RotorControl.RotorReferencePair { rotor = azimuth, reference = gatlingGuns[0] };
+                RotorControl.RotorReferencePair azimuthPair = new RotorControl.RotorReferencePair { rotor = azimuth, reference = gatlingGunsList[0] };
+
+                gatlingGuns = new IMyUserControllableGun[gatlingGunsList.Count];
+                for(int i = 0; i < gatlingGunsList.Count; i++)
+                {
+                    gatlingGuns[i] = gatlingGunsList[i];
+                }
+                gatlingGunsList = null;
 
                 rotorControl = new RotorControl(azimuthPair, elevationPairs);
                 rotorControl.onTarget = OnTarget;
