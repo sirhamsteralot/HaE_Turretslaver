@@ -24,6 +24,7 @@ namespace IngameScript
             public Vector3D defaultDir;
             public bool restMode = false;
             public bool inactive = false;
+            public bool restAfterReset = false;
 
             private bool firing = false;
             Vector3D currentTargetDir;
@@ -150,6 +151,7 @@ namespace IngameScript
             {
                 currentTargetDir = targetDirection;
                 restMode = false;
+                restAfterReset = false;
             }
 
             public void TargetPosition(Vector3D position)
@@ -170,7 +172,7 @@ namespace IngameScript
                         return;
                     }
 
-                    if (rotorControl.currentAccuracy > 0.9999)
+                    if (rotorControl.currentAccuracy > 0.9999 && restAfterReset)
                     {
                         rotorControl.Lock(true);
                         restMode = true;

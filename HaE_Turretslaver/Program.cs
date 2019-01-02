@@ -511,12 +511,14 @@ namespace IngameScript
             {
                 turretGroup.TargetDirection(Vector3D.Zero);
                 turretGroup.defaultDir = control.WorldMatrix.Forward;
+                turretGroup.restAfterReset = true;
             }
 
             foreach (GatlingTurretGroup group in gatlingTurretGroups)
             {
                 group.TargetDirection(Vector3D.Zero);
                 group.defaultDir = control.WorldMatrix.Forward;
+                group.restAfterReset = true;
             }
 
             statusWriter.UpdateStatus(StatusWriter.TargetingStatus.Idle);

@@ -51,11 +51,13 @@ namespace IngameScript
 
             public void Lock(bool val)
             {
-                azimuth.rotor.RotorLock = val;
+                if (azimuth.rotor.RotorLock != val)
+                    azimuth.rotor.RotorLock = val;
 
                 foreach (var elevation in elevationRotors)
                 {
-                    elevation.rotor.RotorLock = val;
+                    if (elevation.rotor.RotorLock != val)
+                        elevation.rotor.RotorLock = val;
                 }
             }
 
