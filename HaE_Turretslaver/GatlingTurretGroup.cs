@@ -29,7 +29,7 @@ namespace IngameScript
             public bool restAfterReset = true;
 
             private bool firing = false;
-            Vector3D currentTargetDir;
+            Vector3D currentTargetDir = Vector3D.Zero;
 
             INISerializer turretConfig;
             public double azimuthMultiplier { get { return (double)turretConfig.GetValue("azimuthMultiplier"); } }
@@ -104,6 +104,7 @@ namespace IngameScript
                 {
                     FireGuns(false);
                     rotorControl.AimAtTarget(defaultDir, azimuthMultiplier, elevationMultiplier);
+                    restAfterReset = true;
                     return;
                 }
 

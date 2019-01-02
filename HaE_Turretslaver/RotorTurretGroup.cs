@@ -26,9 +26,9 @@ namespace IngameScript
             public Vector3D defaultDir;
             public bool restMode = false;
             public bool inactive = false;
-            public bool restAfterReset = false;
+            public bool restAfterReset = true;
 
-            Vector3D currentTargetDir;
+            Vector3D currentTargetDir = Vector3D.Zero;
 
             INISerializer turretConfig;
             public double azimuthMultiplier { get { return (double)turretConfig.GetValue("azimuthMultiplier"); } }
@@ -118,6 +118,7 @@ namespace IngameScript
                 if (currentTargetDir == Vector3D.Zero)
                 {
                     rotorControl.AimAtTarget(defaultDir, azimuthMultiplier, elevationMultiplier);
+                    restAfterReset = true;
                     return;
                 }
 
