@@ -117,12 +117,12 @@ namespace IngameScript
 
                 if (currentTargetDir == Vector3D.Zero)
                 {
-                    rotorControl.AimAtTarget(defaultDir, azimuthMultiplier, elevationMultiplier);
+                    rotorControl.AimAtTarget(ref defaultDir, azimuthMultiplier, elevationMultiplier);
                     restAfterReset = true;
                     return;
                 }
 
-                rotorControl.AimAtTarget(currentTargetDir, azimuthMultiplier, elevationMultiplier);
+                rotorControl.AimAtTarget(ref currentTargetDir, azimuthMultiplier, elevationMultiplier);
             }
 
             public void DisableTurret(bool value)
@@ -158,7 +158,7 @@ namespace IngameScript
                 return damageAmount;
             }
 
-            public void TargetDirection(Vector3D targetDirection)
+            public void TargetDirection(ref Vector3D targetDirection)
             {
                 if (currentTargetDir != Vector3D.Zero && targetDirection != Vector3D.Zero && currentTargetDir.Dot(targetDirection) < 1 - accuracyVal)
                     return;
@@ -179,10 +179,10 @@ namespace IngameScript
                 restAfterReset = false;
             }
 
-            public void TargetPosition(Vector3D position)
+            public void TargetPosition(ref Vector3D position)
             {
                 Vector3D targetdir = Vector3D.Normalize(position - rotorControl.azimuth.rotor.GetPosition());
-                TargetDirection(targetdir);
+                TargetDirection(ref targetdir);
             }
 
             private void FireCannons(bool fire)

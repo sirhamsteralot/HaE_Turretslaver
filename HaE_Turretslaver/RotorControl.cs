@@ -35,7 +35,7 @@ namespace IngameScript
                 this.elevationRotors = elevationRotors;
             }
 
-            public void AimAtTarget(Vector3D desiredDirection, double azimuthMultiplier = -1, double elevationMultiplier = -1)
+            public void AimAtTarget(ref Vector3D desiredDirection, double azimuthMultiplier = -1, double elevationMultiplier = -1)
             {
                 Vector3D refDirAz = !useForward ? azimuth.reference.WorldMatrix.Up : azimuth.reference.WorldMatrix.Forward;
                 RotorUtils.PointRotorAtVector(azimuth.rotor, azimuthMultiplier * desiredDirection, refDirAz, 2);
@@ -45,7 +45,7 @@ namespace IngameScript
                     var refDirEl = !useForward ? elevation.reference.WorldMatrix.Up : elevation.reference.WorldMatrix.Forward;
                     RotorUtils.PointRotorAtVector(elevation.rotor, elevationMultiplier * desiredDirection, refDirEl, 2);
 
-                    CheckSetTarget(desiredDirection, refDirEl, elevation);
+                    CheckSetTarget(ref desiredDirection, ref refDirEl, elevation);
                 }
             }
 
@@ -62,7 +62,7 @@ namespace IngameScript
             }
 
             int delayTicks;
-            private void CheckSetTarget(Vector3D desiredDir, Vector3D currentDir, RotorReferencePair rotor)
+            private void CheckSetTarget(ref Vector3D desiredDir, ref Vector3D currentDir, RotorReferencePair rotor)
             {
                 if (delayTicks++ > 100)
                 {

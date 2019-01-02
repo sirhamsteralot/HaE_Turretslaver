@@ -324,7 +324,7 @@ namespace IngameScript
             try
             {
                 turretGroup = new RotorTurretGroup(group, ingameTime, deadzoneProvider, azimuthTag, elevationTag);
-                turretGroup.TargetDirection(Vector3D.Zero);
+                turretGroup.TargetDirection(ref Vector3D.Zero);
                 turretGroup.defaultDir = control.WorldMatrix.Forward;
 
                 if (turretGroup.CheckGroupStatus() != TurretGroupUtils.TurretGroupStatus.MajorDMG)
@@ -340,7 +340,7 @@ namespace IngameScript
             try
             {
                 var turretGroup = new RotorTurretGroup(group, ingameTime, deadzoneProvider, azimuthTag, elevationTag);
-                turretGroup.TargetDirection(Vector3D.Zero);
+                turretGroup.TargetDirection(ref Vector3D.Zero);
                 turretGroup.defaultDir = control.WorldMatrix.Forward;
 
                 if (turretGroup.CheckGroupStatus() != TurretGroupUtils.TurretGroupStatus.MajorDMG)
@@ -385,7 +385,7 @@ namespace IngameScript
                 }
 
                 var turretGroup = new RotorTurretGroup(rotors, ingameTime, deadzoneProvider, azimuthTag, elevationTag);
-                turretGroup.TargetDirection(Vector3D.Zero);
+                turretGroup.TargetDirection(ref Vector3D.Zero);
                 turretGroup.defaultDir = control.WorldMatrix.Forward;
 
                 if (turretGroup.CheckGroupStatus() != TurretGroupUtils.TurretGroupStatus.MajorDMG)
@@ -426,7 +426,7 @@ namespace IngameScript
                 }
 
                 var turretGroup = new GatlingTurretGroup(rotors, ingameTime, deadzoneProvider, azimuthTag, elevationTag);
-                turretGroup.TargetDirection(Vector3D.Zero);
+                turretGroup.TargetDirection(ref Vector3D.Zero);
                 turretGroup.defaultDir = control.WorldMatrix.Forward;
 
                 if (turretGroup.CheckGroupStatus() != TurretGroupUtils.TurretGroupStatus.MajorDMG)
@@ -474,7 +474,7 @@ namespace IngameScript
         {
             foreach(var gatlingTurret in gatlingTurretGroups)
             {
-                gatlingTurret.TargetPosition(targetPos);
+                gatlingTurret.TargetPosition(ref targetPos);
             }
         }
 
@@ -482,7 +482,7 @@ namespace IngameScript
         {
             foreach (RotorTurretGroup turretGroup in rotorTurretGroups)
             {
-                turretGroup.TargetPosition(targetPos);
+                turretGroup.TargetPosition(ref targetPos);
             }
 
             statusWriter.UpdateStatus(StatusWriter.TargetingStatus.Ontarget);
@@ -492,7 +492,7 @@ namespace IngameScript
         {
             foreach (RotorTurretGroup turretGroup in rotorTurretGroups)
             {
-                turretGroup.TargetDirection(Vector3D.Zero);
+                turretGroup.TargetDirection(ref Vector3D.Zero);
 
                 if (gridCannonTargeting.simTargeting != null)
                 {
@@ -509,14 +509,14 @@ namespace IngameScript
         {
             foreach (RotorTurretGroup turretGroup in rotorTurretGroups)
             {
-                turretGroup.TargetDirection(Vector3D.Zero);
+                turretGroup.TargetDirection(ref Vector3D.Zero);
                 turretGroup.defaultDir = control.WorldMatrix.Forward;
                 turretGroup.restAfterReset = true;
             }
 
             foreach (GatlingTurretGroup group in gatlingTurretGroups)
             {
-                group.TargetDirection(Vector3D.Zero);
+                group.TargetDirection(ref Vector3D.Zero);
                 group.defaultDir = control.WorldMatrix.Forward;
                 group.restAfterReset = true;
             }

@@ -24,8 +24,8 @@ namespace IngameScript
             void Tick();
             void DisableTurret(bool value);
             TurretGroupUtils.TurretGroupStatus CheckGroupStatus();
-            void TargetDirection(Vector3D targetDirection);
-            void TargetPosition(Vector3D position);
+            void TargetDirection(ref Vector3D targetDirection);
+            void TargetPosition(ref Vector3D position);
 
         }
     }
