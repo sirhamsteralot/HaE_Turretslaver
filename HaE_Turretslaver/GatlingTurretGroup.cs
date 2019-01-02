@@ -26,7 +26,7 @@ namespace IngameScript
             public Vector3D defaultDir;
             public bool restMode = false;
             public bool inactive = false;
-            public bool restAfterReset = false;
+            public bool restAfterReset = true;
 
             private bool firing = false;
             Vector3D currentTargetDir;
