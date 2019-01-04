@@ -32,7 +32,10 @@ namespace IngameScript
         public string groupType { get { return (string)nameSerializer.GetValue("groupType"); } }
         public string lcdStatusTag { get { return (string)nameSerializer.GetValue("lcdStatusTag"); } }
         public double maxProjectileVel { get { return (double)nameSerializer.GetValue("maxProjectileVel"); } }
+        public double maxActiveRotorGunVel { get { return (double)nameSerializer.GetValue("maxActiveRotorGunVel"); } }
+
         public double maxGatlingBulletVel { get { return (double)nameSerializer.GetValue("maxGatlingBulletVel"); } }
+
         public bool enableAutoDeadzoning { get { return (bool)nameSerializer.GetValue("enableAutoDeadzoning"); } }
         #endregion
 
@@ -67,6 +70,7 @@ namespace IngameScript
             nameSerializer.AddValue("groupType", x => x, "Any");
             nameSerializer.AddValue("lcdStatusTag", x => x, "[GridcannonStatus]");
             nameSerializer.AddValue("maxProjectileVel", x => double.Parse(x), 100.0);
+            nameSerializer.AddValue("maxActiveRotorGunVel", x => double.Parse(x), 30.0);
             nameSerializer.AddValue("maxGatlingBulletVel", x => double.Parse(x), 400.0);
             nameSerializer.AddValue("enableAutoDeadzoning", x => bool.Parse(x), true);
 
@@ -465,7 +469,17 @@ namespace IngameScript
             if (IgnoreEventAfterOnce)
                 return;
 
-            gridCannonTargeting.NewTarget(entity.entityInfo);
+            if (control.GetShipSpeed() < maxActiveRotorGunVel)
+            {
+                gridCannonTargeting.NewTarget(entity.entityInfo);
+            } else
+            {
+                foreach (var cannon in rotorTurretGroups)
+                {
+                    cannon.TargetDirection(ref Vector3D.Zero);
+                }
+            }
+            
             statusWriter.UpdateStatus(StatusWriter.TargetingStatus.Targeting);
 
             basicTargeting.UpdateValues(control.GetVelocityVector(), control.GetPosition(), maxGatlingBulletVel);
