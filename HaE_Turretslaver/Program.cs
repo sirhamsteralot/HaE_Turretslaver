@@ -69,7 +69,7 @@ namespace IngameScript
             nameSerializer.AddValue("controllerName", x => x, "Controller");
             nameSerializer.AddValue("groupType", x => x, "Any");
             nameSerializer.AddValue("lcdStatusTag", x => x, "[GridcannonStatus]");
-            nameSerializer.AddValue("maxProjectileVel", x => double.Parse(x), 100.0);
+            nameSerializer.AddValue("maxProjectileVel", x => double.Parse(x), 104.45);
             nameSerializer.AddValue("maxActiveRotorGunVel", x => double.Parse(x), 30.0);
             nameSerializer.AddValue("maxGatlingBulletVel", x => double.Parse(x), 400.0);
             nameSerializer.AddValue("enableAutoDeadzoning", x => bool.Parse(x), true);
