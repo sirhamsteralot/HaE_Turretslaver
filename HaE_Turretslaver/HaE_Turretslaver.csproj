@@ -103,6 +103,7 @@
     <AdditionalFiles Include="MDK\MDK.options">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </AdditionalFiles>
+    <Compile Include="MissileTurretGroup.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Readme.cs" />
     <AdditionalFiles Include="thumb.png" />

@@ -26,6 +26,7 @@ namespace IngameScript
 
         public string rotorTurretGroupTag { get { return (string)nameSerializer.GetValue("rotorTurretGroupTag"); } }
         public string gatlingTurretGroupTag { get { return (string)nameSerializer.GetValue("gatlingTurretGroupTag"); } }
+        public string missileTurretGroupTag { get { return (string)nameSerializer.GetValue("missileTurretGroupTag"); } }
         public string azimuthTag { get { return (string)nameSerializer.GetValue("azimuthTag"); } }
         public string elevationTag { get { return (string)nameSerializer.GetValue("elevationTag"); } }
         public string controllerName { get { return (string)nameSerializer.GetValue("controllerName"); } }
@@ -42,9 +43,11 @@ namespace IngameScript
         DeadzoneProvider deadzoneProvider;
 
         List<RotorTurretGroup> rotorTurretGroups;
+        List<MissileTurretGroup> missileTurretGroups;
         List<GatlingTurretGroup> gatlingTurretGroups;
         EntityTracking_Module targetTracker;
-        GridCannonTargeting gridCannonTargeting;
+        PhysicsTargeting gridCannonTargeting;
+        PhysicsTargeting missileCannonTargeting;
         QuarticTargeting basicTargeting;
         StatusWriter statusWriter;
 
@@ -64,6 +67,7 @@ namespace IngameScript
 
             nameSerializer.AddValue("rotorTurretGroupTag", x => x, "[HaE RotorTurret]");
             nameSerializer.AddValue("gatlingTurretGroupTag", x => x, "[HaE GatlingTurret]");
+            nameSerializer.AddValue("missileTurretGroupTag", x => x, "[HaE GatlingTurret]");
             nameSerializer.AddValue("azimuthTag", x => x, "[Azimuth]");
             nameSerializer.AddValue("elevationTag", x => x, "[Elevation]");
             nameSerializer.AddValue("controllerName", x => x, "Controller");
@@ -90,6 +94,7 @@ namespace IngameScript
             mainScheduler = new Scheduler();
             ingameTime = new IngameTime();
             rotorTurretGroups = new List<RotorTurretGroup>();
+            missileTurretGroups = new List<MissileTurretGroup>();
             gatlingTurretGroups = new List<GatlingTurretGroup>();
             deadzoneProvider = new DeadzoneProvider(GTSUtils);
             deadzoneProvider.Enabled = enableAutoDeadzoning;
@@ -123,10 +128,15 @@ namespace IngameScript
             }
             targetTracker.onEntityDetected += OnEntityDetected;
 
-            gridCannonTargeting = new GridCannonTargeting(control, ingameTime, maxProjectileVel);
-            gridCannonTargeting.onRoutineFinish += OnTargetSolved;
-            gridCannonTargeting.onRoutineFail += OnTargetingFail;
-            gridCannonTargeting.onTargetTimeout += OnTargetTimeout;
+            gridCannonTargeting = new PhysicsTargeting(control, ingameTime, maxProjectileVel);
+            gridCannonTargeting.onRoutineFinish += OnTargetSolvedRotor;
+            gridCannonTargeting.onRoutineFail += OnTargetingFailRotor;
+            gridCannonTargeting.onTargetTimeout += OnTargetTimeoutRotor;
+
+            missileCannonTargeting = new PhysicsTargeting(control, ingameTime, maxProjectileVel);
+            missileCannonTargeting.onRoutineFinish += OnTargetSolvedMissile;
+            missileCannonTargeting.onRoutineFail += OnTargetingFailMissile;
+            missileCannonTargeting.onTargetTimeout += OnTargetTimeoutMissile;
 
             basicTargeting = new QuarticTargeting(Vector3D.Zero, Vector3D.Zero, maxGatlingBulletVel);
 
@@ -147,6 +157,13 @@ namespace IngameScript
                         AddGatlingTurret(group);
                         yield return true;
                     }
+                    groups.Clear();
+                    GridTerminalSystem.GetBlockGroups(groups, x => x.Name.Contains(missileTurretGroupTag));
+                    foreach (var group in groups)
+                    {
+                        AddMissileTurret(group);
+                        yield return true;
+                    }
                     break;
 
                 case "NameTag":
@@ -162,6 +179,13 @@ namespace IngameScript
                     foreach (var stator in rotors)
                     {
                         AddGatlingTurret(stator);
+                        yield return true;
+                    }
+                    rotors.Clear();
+                    GridTerminalSystem.GetBlocksOfType(rotors, x => x.CustomName.Contains(missileTurretGroupTag));
+                    foreach (var stator in rotors)
+                    {
+                        AddMissileTurret(stator);
                         yield return true;
                     }
                     break;
@@ -181,6 +205,13 @@ namespace IngameScript
                         AddGatlingTurret(group);
                         yield return true;
                     }
+                    groupsA.Clear();
+                    GridTerminalSystem.GetBlockGroups(groupsA, x => x.Name.Contains(missileTurretGroupTag));
+                    foreach (var group in groupsA)
+                    {
+                        AddMissileTurret(group);
+                        yield return true;
+                    }
 
                     List<IMyMotorStator> rotorsA = new List<IMyMotorStator>();
                     GridTerminalSystem.GetBlocksOfType(rotorsA, x => x.CustomName.Contains(rotorTurretGroupTag));
@@ -194,6 +225,13 @@ namespace IngameScript
                     foreach (var stator in rotorsA)
                     {
                         AddGatlingTurret(stator);
+                        yield return true;
+                    }
+                    rotorsA.Clear();
+                    GridTerminalSystem.GetBlocksOfType(rotorsA, x => x.CustomName.Contains(missileTurretGroupTag));
+                    foreach (var stator in rotorsA)
+                    {
+                        AddMissileTurret(stator);
                         yield return true;
                     }
                     break;
@@ -239,6 +277,7 @@ namespace IngameScript
 
                 tempCount = Runtime.CurrentInstructionCount;
                 gridCannonTargeting.Tick();
+                missileCannonTargeting.Tick();
                 tempCount = Runtime.CurrentInstructionCount - tempCount;
                 averageGridTargetingInstructionCount = tempCount * 0.01 + averageGridTargetingInstructionCount * 0.99;
 
@@ -249,7 +288,7 @@ namespace IngameScript
 
                 ingameTime.Tick(Runtime.TimeSinceLastRun);
 
-                Echo($"turretCount: {rotorTurretGroups.Count + gatlingTurretGroups.Count}");
+                Echo($"turretCount: {rotorTurretGroups.Count + gatlingTurretGroups.Count + missileTurretGroups.Count}");
 
                 averageTotalInstructionCount = Runtime.CurrentInstructionCount * 0.01 + averageTotalInstructionCount * 0.99;
                 Echo($"\nComplexity:\nTotal: {averageTotalInstructionCount: #.##}\n" +
@@ -273,6 +312,7 @@ namespace IngameScript
 
 
             gridCannonTargeting.Tick();
+            missileCannonTargeting.Tick();
             TickTurrets();
 
             ingameTime.Tick(Runtime.TimeSinceLastRun);
@@ -340,6 +380,23 @@ namespace IngameScript
                 if (turretGroup.CheckGroupStatus() != TurretGroupUtils.TurretGroupStatus.MajorDMG)
                     rotorTurretGroups.Add(turretGroup);
             } catch
+            {
+                statusWriter.AddUninitializable(1);
+            }
+        }
+
+        public void AddMissileTurret(IMyBlockGroup group)
+        {
+            try
+            {
+                var turretGroup = new MissileTurretGroup(GTSUtils, group, ingameTime, deadzoneProvider, azimuthTag, elevationTag);
+                turretGroup.TargetDirection(ref Vector3D.Zero);
+                turretGroup.defaultDir = control.WorldMatrix.Forward;
+
+                if (turretGroup.CheckGroupStatus() != TurretGroupUtils.TurretGroupStatus.MajorDMG)
+                    missileTurretGroups.Add(turretGroup);
+            }
+            catch
             {
                 statusWriter.AddUninitializable(1);
             }
@@ -448,6 +505,47 @@ namespace IngameScript
             }
         }
 
+        public void AddMissileTurret(IMyMotorStator sourceRotor)
+        {
+            try
+            {
+                rotors.Clear();
+                cache.Clear();
+                prevTop.Clear();
+                currentTop.Clear();
+
+                rotors.Add(sourceRotor);
+                prevTop.AddRange(rotors);
+
+                while (prevTop.Count > 0)
+                {
+                    foreach (var rotor in prevTop)
+                    {
+                        cache.Clear();
+                        rotor.TopGrid?.GetCubesOfType(GridTerminalSystem, cache);
+                        currentTop.AddRange(cache);
+                    }
+
+                    rotors.AddRange(currentTop);
+
+                    prevTop.Clear();
+                    prevTop.AddRange(currentTop);
+                    currentTop.Clear();
+                }
+
+                var turretGroup = new MissileTurretGroup(GTSUtils, rotors, ingameTime, deadzoneProvider, azimuthTag, elevationTag);
+                turretGroup.TargetDirection(ref Vector3D.Zero);
+                turretGroup.defaultDir = control.WorldMatrix.Forward;
+
+                if (turretGroup.CheckGroupStatus() != TurretGroupUtils.TurretGroupStatus.MajorDMG)
+                    missileTurretGroups.Add(turretGroup);
+            }
+            catch
+            {
+                statusWriter.AddUninitializable(1);
+            }
+        }
+
         public void TickTurrets()
         {
             foreach (RotorTurretGroup turret in rotorTurretGroups)
@@ -457,7 +555,11 @@ namespace IngameScript
             foreach (GatlingTurretGroup turret in gatlingTurretGroups)
             {
                 turret.Tick();
-            }  
+            }
+            foreach(MissileTurretGroup turret in missileTurretGroups)
+            {
+                turret.Tick();
+            }
         }
 
         
@@ -482,6 +584,7 @@ namespace IngameScript
             
             statusWriter.UpdateStatus(StatusWriter.TargetingStatus.Targeting);
 
+            missileCannonTargeting.NewTarget(entity.entityInfo);
             basicTargeting.UpdateValues(control.GetVelocityVector(), control.GetPosition(), maxGatlingBulletVel);
             var result = basicTargeting.CalculateTrajectory(entity.entityInfo);
             if (result.HasValue)
@@ -498,7 +601,8 @@ namespace IngameScript
             }
         }
 
-        public void OnTargetSolved(Vector3D targetPos)
+        #region rotorCannonEvents
+        public void OnTargetSolvedRotor(Vector3D targetPos)
         {
             foreach (RotorTurretGroup turretGroup in rotorTurretGroups)
             {
@@ -508,7 +612,7 @@ namespace IngameScript
             statusWriter.UpdateStatus(StatusWriter.TargetingStatus.Ontarget);
         }
 
-        public void OnTargetingFail()
+        public void OnTargetingFailRotor()
         {
             foreach (RotorTurretGroup turretGroup in rotorTurretGroups)
             {
@@ -525,7 +629,7 @@ namespace IngameScript
             statusWriter.UpdateStatus(StatusWriter.TargetingStatus.Targeting);
         }
 
-        public void OnTargetTimeout()
+        public void OnTargetTimeoutRotor()
         {
             foreach (RotorTurretGroup turretGroup in rotorTurretGroups)
             {
@@ -534,14 +638,49 @@ namespace IngameScript
                 turretGroup.restAfterReset = true;
             }
 
-            foreach (GatlingTurretGroup group in gatlingTurretGroups)
+            statusWriter.UpdateStatus(StatusWriter.TargetingStatus.Idle);
+        }
+        #endregion
+
+        #region missileCannonEvents
+        public void OnTargetSolvedMissile(Vector3D targetPos)
+        {
+            foreach (MissileTurretGroup turretGroup in missileTurretGroups)
             {
-                group.TargetDirection(ref Vector3D.Zero);
-                group.defaultDir = control.WorldMatrix.Forward;
-                group.restAfterReset = true;
+                turretGroup.TargetPosition(ref targetPos);
+            }
+
+            statusWriter.UpdateStatus(StatusWriter.TargetingStatus.Ontarget);
+        }
+
+        public void OnTargetingFailMissile()
+        {
+            foreach (MissileTurretGroup turretGroup in missileTurretGroups)
+            {
+                turretGroup.TargetDirection(ref Vector3D.Zero);
+
+                if (missileCannonTargeting.simTargeting != null)
+                {
+                    Vector3D currentSimDir = missileCannonTargeting.simTargeting.firingDirection;
+
+                    turretGroup.defaultDir = currentSimDir;
+                }
+            }
+
+            statusWriter.UpdateStatus(StatusWriter.TargetingStatus.Targeting);
+        }
+
+        public void OnTargetTimeoutMissile()
+        {
+            foreach (MissileTurretGroup turretGroup in missileTurretGroups)
+            {
+                turretGroup.TargetDirection(ref Vector3D.Zero);
+                turretGroup.defaultDir = control.WorldMatrix.Forward;
+                turretGroup.restAfterReset = true;
             }
 
             statusWriter.UpdateStatus(StatusWriter.TargetingStatus.Idle);
         }
+        #endregion
     }
 }
