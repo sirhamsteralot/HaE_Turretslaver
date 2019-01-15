@@ -81,6 +81,7 @@ namespace IngameScript
             nameSerializer.AddValue("maxActiveRotorGunVel", x => double.Parse(x), 30.0);
             nameSerializer.AddValue("maxGatlingBulletVel", x => double.Parse(x), 400.0);
             nameSerializer.AddValue("maxMissileAccel", x => double.Parse(x), 600.0);
+            nameSerializer.AddValue("maxMissileVel", x => double.Parse(x), 200.0);
             nameSerializer.AddValue("maxGatlingBulletVel", x => double.Parse(x), 400.0);
             nameSerializer.AddValue("enableAutoDeadzoning", x => bool.Parse(x), true);
 
