@@ -79,6 +79,7 @@ namespace IngameScript
 
                 rotorControl = new RotorControl(azimuthPair, elevationPairs);
                 rotorControl.onTarget = OnTarget;
+                rotorControl.useForward = true;
 
                 #region configuration
                 turretConfig = new INISerializer("TurretConfig");

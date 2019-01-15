@@ -36,6 +36,10 @@ namespace IngameScript
         public double maxActiveRotorGunVel { get { return (double)nameSerializer.GetValue("maxActiveRotorGunVel"); } }
 
         public double maxGatlingBulletVel { get { return (double)nameSerializer.GetValue("maxGatlingBulletVel"); } }
+        public double maxMissileVel { get { return (double)nameSerializer.GetValue("maxMissileVel"); } }
+
+        public double maxMissileAccel { get { return (double)nameSerializer.GetValue("maxMissileAccel"); } }
+
 
         public bool enableAutoDeadzoning { get { return (bool)nameSerializer.GetValue("enableAutoDeadzoning"); } }
         #endregion
@@ -67,7 +71,7 @@ namespace IngameScript
 
             nameSerializer.AddValue("rotorTurretGroupTag", x => x, "[HaE RotorTurret]");
             nameSerializer.AddValue("gatlingTurretGroupTag", x => x, "[HaE GatlingTurret]");
-            nameSerializer.AddValue("missileTurretGroupTag", x => x, "[HaE GatlingTurret]");
+            nameSerializer.AddValue("missileTurretGroupTag", x => x, "[HaE MissileTurret]");
             nameSerializer.AddValue("azimuthTag", x => x, "[Azimuth]");
             nameSerializer.AddValue("elevationTag", x => x, "[Elevation]");
             nameSerializer.AddValue("controllerName", x => x, "Controller");
@@ -75,6 +79,8 @@ namespace IngameScript
             nameSerializer.AddValue("lcdStatusTag", x => x, "[GridcannonStatus]");
             nameSerializer.AddValue("maxProjectileVel", x => double.Parse(x), 104.45);
             nameSerializer.AddValue("maxActiveRotorGunVel", x => double.Parse(x), 30.0);
+            nameSerializer.AddValue("maxGatlingBulletVel", x => double.Parse(x), 400.0);
+            nameSerializer.AddValue("maxMissileAccel", x => double.Parse(x), 600.0);
             nameSerializer.AddValue("maxGatlingBulletVel", x => double.Parse(x), 400.0);
             nameSerializer.AddValue("enableAutoDeadzoning", x => bool.Parse(x), true);
 
@@ -133,10 +139,12 @@ namespace IngameScript
             gridCannonTargeting.onRoutineFail += OnTargetingFailRotor;
             gridCannonTargeting.onTargetTimeout += OnTargetTimeoutRotor;
 
-            missileCannonTargeting = new PhysicsTargeting(control, ingameTime, maxProjectileVel);
+            missileCannonTargeting = new PhysicsTargeting(control, ingameTime, maxMissileVel);
             missileCannonTargeting.onRoutineFinish += OnTargetSolvedMissile;
             missileCannonTargeting.onRoutineFail += OnTargetingFailMissile;
             missileCannonTargeting.onTargetTimeout += OnTargetTimeoutMissile;
+            missileCannonTargeting.IgnoreGravity = true;
+            missileCannonTargeting.ForwardAccel = maxMissileAccel;
 
             basicTargeting = new QuarticTargeting(Vector3D.Zero, Vector3D.Zero, maxGatlingBulletVel);
 

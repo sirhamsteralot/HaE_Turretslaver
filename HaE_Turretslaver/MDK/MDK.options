@@ -6,7 +6,7 @@
   <installpath>C:\Users\SirHa\AppData\Local\Microsoft\VisualStudio\15.0_d85c6838\Extensions\kpsbcfli.o4q</installpath>
   <outputpath>C:\Users\SirHa\AppData\Roaming\SpaceEngineers\IngameScripts\local</outputpath>
   <trimtypes>yes</trimtypes>
-  <minify>no</minify>
+  <minify>yes</minify>
   <ignore>
     <folder>mdk</folder>
   </ignore>
